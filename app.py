@@ -93,7 +93,7 @@ def profile():
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
 	awair = OAuth2Session(client_id, token=session['oauth_token'])
-	return jsonify(awair.get('http://developer-apis.awair.is/v1/users/self').json())
+	return jsonify(awair.get('https://developer-apis.awair.is/v1/users/self').json())
 
 
 @app.route("/automatic_refresh", methods=["GET"])
@@ -122,7 +122,7 @@ def automatic_refresh():
 							token_updater=token_updater)
 	
 	# Trigger the automatic refresh
-	jsonify(awair.get('http://developer-apis.awair.is/v1/users/self').json())
+	jsonify(awair.get('https://developer-apis.awair.is/v1/users/self').json())
 	return jsonify(session['oauth_token'])
 
 
@@ -144,6 +144,6 @@ def manual_refresh():
 
 if __name__ == "__main__":
 	# This allows us to use a plain HTTP callback
-	os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
+	#os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
 	
 	app.run(debug=True)
