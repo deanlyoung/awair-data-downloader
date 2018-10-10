@@ -44,7 +44,7 @@ def demo():
 	)
 	
 	# State is used to prevent CSRF, keep this for later.
-	session['oauth_state'] = state
+	session['state'] = state
 	return redirect(authorization_url)
 
 
@@ -59,7 +59,7 @@ def callback():
 	"""
 	
 	awair = OAuth2Session(client_id, redirect_uri=redirect_uri,
-										state=session['oauth_state'])
+										state=session['state'])
 	token = awair.fetch_token(token_url, client_secret=client_secret,
 											authorization_response=request.url)
 	
