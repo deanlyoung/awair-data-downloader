@@ -14,7 +14,7 @@ app.secret_key = os.urandom(24)
 # application at https://developer.getawair.com
 client_id = os.environ.get('CLIENT_ID', None)
 client_secret = os.environ.get('CLIENT_SECRET', None)
-#redirect_uri = "https://awair-data-downloader.herokuapp.com/callback"
+redirect_uri = "https://awair-data-downloader.herokuapp.com/callback"
 
 # Uncomment for detailed oauthlib logs
 import logging
@@ -36,7 +36,7 @@ def demo():
 	Redirect the user/resource owner to the OAuth provider (i.e. Awair)
 	using an URL with a few key OAuth parameters.
 	"""
-	awair = OAuth2Session(client_id, scope=scope)#, redirect_uri=redirect_uri)
+	awair = OAuth2Session(client_id, scope=scope), redirect_uri=redirect_uri)
 	authorization_url, state = awair.authorization_url(authorization_base_url)#,
 		# offline for refresh token
 		# force to always make user click authorize
