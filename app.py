@@ -1,4 +1,3 @@
-import os
 from pprint import pformat
 from time import time
 
@@ -8,7 +7,6 @@ import requests
 from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
@@ -147,4 +145,5 @@ if __name__ == "__main__":
 	import os
 	os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
 	
+	app.secret_key = os.urandom(24)
 	app.run(debug=True)
