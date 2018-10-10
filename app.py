@@ -48,7 +48,7 @@ def demo():
 
 
 # Step 2: User authorization, this happens on the provider.
-@app.route("/callback", methods=["GET"])
+@app.route("/callback", methods=["GET","POST"])
 def callback():
 	""" Step 3: Retrieving an access token.
 	
