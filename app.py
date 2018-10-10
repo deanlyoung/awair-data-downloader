@@ -40,7 +40,7 @@ def demo():
 	authorization_url, state = awair.authorization_url(authorization_base_url)
 	
 	# State is used to prevent CSRF, keep this for later.
-	session['oauth_state'] = state
+	session['state'] = state
 	return redirect(authorization_url)
 
 
@@ -54,7 +54,7 @@ def callback():
 	in the redirect URL. We will use that to obtain an access token.
 	"""
 	
-	awair = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['oauth_state'])
+	awair = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['state'])
 	token = awair.fetch_token(token_url, client_id=client_id, client_secret=client_secret, code=session['code'], grant_type="authorization_code")
 	
 	# We use the session as a simple DB for this example.
