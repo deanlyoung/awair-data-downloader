@@ -14,7 +14,7 @@ app.secret_key = os.urandom(24)
 # application at https://developer.getawair.com
 client_id = os.environ.get('CLIENT_ID', None)
 client_secret = os.environ.get('CLIENT_SECRET', None)
-redirect_uri = "https://awair-data-downloader.heroku.com/callback"
+redirect_uri = "https://awair-data-downloader.herokuapp.com/callback"
 
 # Uncomment for detailed oauthlib logs
 import logging
