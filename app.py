@@ -1,3 +1,4 @@
+import os
 from pprint import pformat
 from time import time
 
@@ -142,7 +143,6 @@ def manual_refresh():
 
 if __name__ == "__main__":
 	# This allows us to use a plain HTTP callback
-	import os
 	os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
 	
 	app.secret_key = os.urandom(24)
