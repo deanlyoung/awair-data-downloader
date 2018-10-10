@@ -37,7 +37,7 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	authorization_url, state = awair.authorization_url(authorization_base_url)#,
+	authorization_url, state = awair.authorization_url(authorization_base_url, response_type="code")#,
 		# offline for refresh token
 		# force to always make user click authorize
 		#access_type="offline", prompt="select_account")
@@ -62,10 +62,10 @@ def callback():
 	token = awair.fetch_token(token_url, client_id=client_id,
 											client_secret=client_secret,
 											grant_type="authorization_code",
-											code=session['code'])
+											authorization_response=request.url)
 	
 	# We use the session as a simple DB for this example.
-	session['access_token'] = token
+	session['access_token'] = token['access_token']
 	
 	return redirect(url_for('.menu'))
 
@@ -94,7 +94,7 @@ def profile():
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
 	awair = OAuth2Session(client_id, token=session['access_token'])
-	return jsonify(awair.get('https://developer-apis.awair.is/v1/users/self').json())
+	return jsonify(awair.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['access_token']}).json())
 
 
 @app.route("/automatic_refresh", methods=["GET"])
