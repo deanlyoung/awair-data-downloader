@@ -10,8 +10,8 @@ app = Flask(__name__)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
-client_id = process.env.CLIENT_ID
-client_secret = process.env.CLIENT_SECRET
+client_id = os.environ.get('CLIENT_ID', None)
+client_secret = os.environ.get('CLIENT_SECRET', None)
 redirect_uri = "https://awair-data-downloader.heroku.com/callback"
 
 # Uncomment for detailed oauthlib logs
