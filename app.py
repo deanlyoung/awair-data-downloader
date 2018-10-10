@@ -36,7 +36,7 @@ def demo():
 	Redirect the user/resource owner to the OAuth provider (i.e. Awair)
 	using an URL with a few key OAuth parameters.
 	"""
-	awair = OAuth2Session(client_id, scope=scope), redirect_uri=redirect_uri)
+	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 	authorization_url, state = awair.authorization_url(authorization_base_url)#,
 		# offline for refresh token
 		# force to always make user click authorize
