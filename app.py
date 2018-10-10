@@ -37,7 +37,7 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	authorization_url, state = awair.authorization_url(authorization_base_url, response_type="code")#,
+	authorization_url, state = awair.authorization_url(authorization_base_url)#,
 		# offline for refresh token
 		# force to always make user click authorize
 		#access_type="offline", prompt="select_account")
@@ -48,7 +48,7 @@ def demo():
 
 
 # Step 2: User authorization, this happens on the provider.
-@app.route("/callback", methods=["GET","POST"])
+@app.route("/callback", methods=["GET"])
 def callback():
 	""" Step 3: Retrieving an access token.
 	
