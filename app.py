@@ -37,10 +37,7 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	authorization_url, state = awair.authorization_url(authorization_base_url,
-		# offline for refresh token
-		# force to always make user click authorize
-		access_type="offline", prompt="select_account")
+	authorization_url, state = awair.authorization_url(authorization_base_url)
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['oauth_state'] = state
@@ -63,7 +60,7 @@ def callback():
 											authorization_response=request.url)
 	
 	# We use the session as a simple DB for this example.
-	session['oauth_token'] = token
+	session['oauth_token'] = token['access_token']
 	
 	return redirect(url_for('.menu'))
 
