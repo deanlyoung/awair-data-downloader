@@ -37,7 +37,7 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	authorization_url, state = awair.authorization_url(authorization_base_url, response_type="code")
+	authorization_url, state = awair.authorization_url(authorization_base_url)
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['oauth_state'] = state
