@@ -59,8 +59,7 @@ def callback():
 	
 	awair = OAuth2Session(client_id, redirect_uri=redirect_uri,
 										state=session['state'])
-	token = awair.fetch_token(token_url, client_id=client_id,
-											client_secret=client_secret,
+	token = awair.fetch_token(token_url, client_secret=client_secret,
 											grant_type="authorization_code",
 											authorization_response=request.url)
 	
