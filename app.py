@@ -53,9 +53,9 @@ def callback():
 	callback URL. With this redirection comes an authorization code included
 	in the redirect URL. We will use that to obtain an access token.
 	"""
-	
+	kwargs = {"grant_type":"authorization_code"}
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri)
-	token = oauth.fetch_token(token_url, client_id=client_id, client_secret=client_secret, grant_type="authorization_code", authorization_response=request.url)
+	token = oauth.fetch_token(token_url, client_id=client_id, client_secret=client_secret, authorization_response=request.url)
 	
 	return jsonify(token)
 	
