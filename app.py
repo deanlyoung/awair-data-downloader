@@ -36,8 +36,8 @@ def demo():
 	Redirect the user/resource owner to the OAuth provider (i.e. Awair)
 	using an URL with a few key OAuth parameters.
 	"""
-	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	authorization_url, state = awair.authorization_url(authorization_base_url)
+	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
+	authorization_url, state = oauth.authorization_url(authorization_base_url)
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['state'] = state
@@ -54,8 +54,8 @@ def callback():
 	in the redirect URL. We will use that to obtain an access token.
 	"""
 	
-	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	token = awair.fetch_token(token_url, client_id=client_id, client_secret=client_secret, grant_type="authorization_code")
+	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri)
+	token = oauth.fetch_token(token_url, client_secret=client_secret, authorization_response=oauth.url)
 	
 	# We use the session as a simple DB for this example.
 	session['oauth_token'] = token['access_token']
@@ -86,8 +86,8 @@ def menu():
 def profile():
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
-	awair = OAuth2Session(client_id, token=session['oauth_token'])
-	return jsonify(awair.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_token']}).json())
+	oauth = OAuth2Session(client_id, token=session['oauth_token'])
+	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_token']}).json())
 
 
 @app.route("/automatic_refresh", methods=["GET"])
@@ -109,14 +109,14 @@ def automatic_refresh():
 	def token_updater(token):
 		session['oauth_token'] = token
 	
-	awair = OAuth2Session(client_id,
+	oauth = OAuth2Session(client_id,
 							token=token,
 							auto_refresh_kwargs=extra,
 							auto_refresh_url=refresh_url,
 							token_updater=token_updater)
 	
 	# Trigger the automatic refresh
-	jsonify(awair.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_token']}).json())
+	jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_token']}).json())
 	return jsonify(session['oauth_token'])
 
 
@@ -131,8 +131,8 @@ def manual_refresh():
 		'client_secret': client_secret,
 	}
 	
-	awair = OAuth2Session(client_id, token=token)
-	session['oauth_token'] = awair.refresh_token(refresh_url, **extra)
+	oauth = OAuth2Session(client_id, token=token)
+	session['oauth_token'] = oauth.refresh_token(refresh_url, **extra)
 	return jsonify(session['oauth_token'])
 
 
