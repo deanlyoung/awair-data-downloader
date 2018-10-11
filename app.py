@@ -54,7 +54,7 @@ def callback():
 	in the redirect URL. We will use that to obtain an access token.
 	"""
 	
-	awair = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['state'])
+	awair = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 	token = awair.fetch_token(token_url, client_id=client_id, client_secret=client_secret, grant_type="authorization_code")
 	
 	# We use the session as a simple DB for this example.
