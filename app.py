@@ -54,7 +54,7 @@ def callback():
 	in the redirect URL. We will use that to obtain an access token.
 	"""
 	
-	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['oauth_state'])
+	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=session['state'])
 	token = oauth.fetch_token(token_url, client_secret=client_secret, authorization_response=request.url)
 	
 	# We use the session as a simple DB for this example.
