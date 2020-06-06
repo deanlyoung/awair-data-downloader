@@ -47,6 +47,9 @@ def demo():
 # Step 2: User authorization, this happens on the provider.
 @app.route("/callback", methods=["GET"])
 def callback():
+	code = request.args.get('code')
+	grant_type = 'authorization_code'
+	
 	""" Step 3: Retrieving an access token.
 	
 	The user has been redirected back from the provider to your registered
@@ -56,7 +59,7 @@ def callback():
 	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	print(request.url)
-	token = oauth.fetch_token(token_url, client_secret=client_secret, grant_type='authorization_code', code=request.code,
+	token = oauth.fetch_token(token_url, client_secret=client_secret, grant_type=grant_type, code=code,
 	authorization_response=request.url)
 	
 	# We use the session as a simple DB for this example.
