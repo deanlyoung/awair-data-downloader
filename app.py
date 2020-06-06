@@ -59,7 +59,7 @@ def callback():
 	"""
 	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
-	print('request_url: ' request.url)
+	print('request_url: ' + request.url)
 	token = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
 	print('token: ' + token)
 	
