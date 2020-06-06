@@ -41,6 +41,7 @@ def demo():
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['state'] = state
+	print(session)
 	return redirect(authorization_url)
 
 
