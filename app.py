@@ -37,10 +37,10 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	authorization_url, #state = oauth.authorization_url(authorization_base_url)
+	authorization_url, state = oauth.authorization_url(authorization_base_url)
 	
 	# State is used to prevent CSRF, keep this for later.
-	#session['state'] = state
+	session['state'] = state
 	return redirect(authorization_url)
 
 
@@ -55,7 +55,7 @@ def callback():
 	"""
 	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
-	token = oauth.fetch_token(token_url, client_secret=client_secret, authorization_response=request.url) #state=session['state'],
+	token = oauth.fetch_token(token_url, client_secret=client_secret, state=session['state'], authorization_response=request.url)
 	
 	# We use the session as a simple DB for this example.
 	session['oauth_token'] = token
