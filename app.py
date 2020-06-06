@@ -108,7 +108,7 @@ def automatic_refresh():
 	extra = {
 		'client_id': client_id,
 		'client_secret': client_secret,
-		'grant_type' = 'refresh_token'
+		'grant_type': 'refresh_token'
 	}
 	
 	def token_updater(token):
