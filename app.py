@@ -90,7 +90,7 @@ def menu():
 def profile():
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
-	oauth = OAuth2Session(client_id, token=session['oauth_token'])
+	oauth = OAuth2Session(client_id, token=session['oauth_token']['access_token'])
 	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
 
 
