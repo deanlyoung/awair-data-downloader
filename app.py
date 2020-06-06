@@ -28,6 +28,7 @@ authorization_base_url = "https://oauth-login.awair.is"
 token_url = "https://oauth2.awair.is/v2/token"
 refresh_url = token_url # True for Awair but not all providers.
 scope = ""
+state = ""
 
 @app.route("/")
 def demo():
@@ -37,7 +38,7 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	authorization_url, state = oauth.authorization_url(authorization_base_url)
+	authorization_url = oauth.authorization_url(authorization_base_url)
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['state'] = state
