@@ -37,9 +37,9 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-	print('oauth: ' + oauth)
 	authorization_url, state = oauth.authorization_url(authorization_base_url)
 	print('authorization_url: ' + authorization_url)
+	print('state: ' + state)
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['state'] = state
