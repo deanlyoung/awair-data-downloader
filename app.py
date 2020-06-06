@@ -48,7 +48,6 @@ def demo():
 @app.route("/callback", methods=["GET"])
 def callback():
 	code = request.args.get('code')
-	grant_type = 'authorization_code'
 	
 	""" Step 3: Retrieving an access token.
 	
@@ -57,7 +56,7 @@ def callback():
 	in the redirect URL. We will use that to obtain an access token.
 	"""
 	
-	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, grant_type=grant_type, state=request.url)
+	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	print(request.url)
 	token = oauth.fetch_token(token_url, client_secret=client_secret, code=code,
 	authorization_response=request.url)
@@ -109,6 +108,7 @@ def automatic_refresh():
 	extra = {
 		'client_id': client_id,
 		'client_secret': client_secret,
+		'grant_type' = 'refresh_token'
 	}
 	
 	def token_updater(token):
@@ -134,6 +134,7 @@ def manual_refresh():
 	extra = {
 		'client_id': client_id,
 		'client_secret': client_secret,
+		'grant_type': 'refresh_token'
 	}
 	
 	oauth = OAuth2Session(client_id, token=token)
