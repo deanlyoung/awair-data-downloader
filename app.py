@@ -59,10 +59,10 @@ def callback():
 	"""
 	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
-	token = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
+	token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
 	
 	# We use the session as a simple DB for this example.
-	session['oauth_token'] = token
+	session['oauth_object'] = token_obj
 	
 	return redirect(url_for('.menu'))
 
@@ -83,7 +83,7 @@ def menu():
 	<pre>
 	%s
 	</pre>
-	""" % pformat(session['oauth_token'], indent=4)
+	""" % pformat(session['oauth_object'], indent=4)
 
 
 @app.route("/profile", methods=["GET"])
@@ -91,19 +91,18 @@ def profile():
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_token'])
-	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_token']}).json())
+	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
 
 
 @app.route("/automatic_refresh", methods=["GET"])
 def automatic_refresh():
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
-	token = session['oauth_token']
-	
+	refresh_token = session['oauth_object']['refresh_token']
 	# We force an expiration by setting expired at in the past.
 	# This will trigger an automatic refresh next time we interact with
 	# Awair's API.
-	token['expires_at'] = time() - 10
+	#token['expires_at'] = time() - 10
 	
 	extra = {
 		'client_id': client_id,
@@ -112,24 +111,24 @@ def automatic_refresh():
 	}
 	
 	def token_updater(token):
-		session['oauth_token'] = token
+		session['oauth_object'] = token
 	
 	oauth = OAuth2Session(client_id,
-							token=token,
+							token=refresh_token,
 							auto_refresh_kwargs=extra,
 							auto_refresh_url=refresh_url,
 							token_updater=token_updater)
 	
 	# Trigger the automatic refresh
-	jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_token']}).json())
-	return jsonify(session['oauth_token'])
+	jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json())
+	return jsonify(session['oauth_object'])
 
 
 @app.route("/manual_refresh", methods=["GET"])
 def manual_refresh():
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
-	token = session['oauth_token']
+	token = session['oauth_object']['refresh_token']
 	
 	extra = {
 		'client_id': client_id,
@@ -138,8 +137,8 @@ def manual_refresh():
 	}
 	
 	oauth = OAuth2Session(client_id, token=token)
-	session['oauth_token'] = oauth.refresh_token(refresh_url, **extra)
-	return jsonify(session['oauth_token'])
+	session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
+	return jsonify(session['oauth_object'])
 
 
 if __name__ == "__main__":
