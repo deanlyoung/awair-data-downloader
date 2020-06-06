@@ -37,7 +37,9 @@ def demo():
 	using an URL with a few key OAuth parameters.
 	"""
 	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
+	print('oauth: ' + oauth)
 	authorization_url, state = oauth.authorization_url(authorization_base_url)
+	print('authorization_url: ' + authorization_url)
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['state'] = state
@@ -48,7 +50,7 @@ def demo():
 @app.route("/callback", methods=["GET"])
 def callback():
 	code = request.args.get('code')
-	
+	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
 	
 	The user has been redirected back from the provider to your registered
@@ -57,9 +59,9 @@ def callback():
 	"""
 	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
-	print(request.url)
-	token = oauth.fetch_token(token_url, client_secret=client_secret, code=code,
-	authorization_response=request.url)
+	print('request_url': request.url)
+	token = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
+	print('token: ' + token)
 	
 	# We use the session as a simple DB for this example.
 	session['oauth_token'] = token
