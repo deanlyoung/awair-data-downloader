@@ -50,7 +50,7 @@ def demo():
 # Step 2: User authorization, this happens on the provider.
 @app.route("/callback", methods=["GET"])
 def callback():
-	sleep(1)
+	sleep(0.5)
 	code = request.args.get('code')
 	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
@@ -71,17 +71,19 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
-	sleep(1)
-	""""""
+	sleep(0.5)
+	"""Main menu
+	"""
 	return """
-	<h1>Congratulations, you have obtained an OAuth 2 token!</h1>
+	<h1>You have successfully logged into your Awair account!</h1>
 	<h2>What would you like to do next?</h2>
 	<ul>
 		<li><a href="/profile"> Get account profile</a></li>
 		<li><a href="/devices"> Get account devices</a></li>
-		<li><a href="/automatic_refresh"> Implicitly refresh the token</a></li>
-		<li><a href="/manual_refresh"> Explicitly refresh the token</a></li>
-		<li><a href="/validate"> Validate the token</a></li>
+		<li><a href="/air-data"> Get device air-data</a></li>
+		<li><a href="/automatic-refresh"> Implicitly refresh the token</a></li>
+		<li><a href="/manual-refresh"> Explicitly refresh the token</a></li>
+		<li><a href="/"> Re-Authenticate</a></li>
 	</ul>
 	
 	<pre>
@@ -92,24 +94,42 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
-	sleep(1)
-	"""Fetching a protected resource using an OAuth 2 token.
+	sleep(0.5)
+	"""Fetching profile data
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
+	sleep(0.5)
 	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
 
 
 @app.route("/devices", methods=["GET"])
 def devices():
-	sleep(1)
-	"""Fetching a protected resource using an OAuth 2 token.
+	sleep(0.5)
+	"""Fetching device list
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
+	sleep(0.5)
 	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
 
-@app.route("/automatic_refresh", methods=["GET"])
+
+@app.route("/air-data", methods=["GET"])
+def air_data():
+	sleep(0.5)
+	device_type = request.args.get('device_type')
+	device_id = request.args.get('device_id')
+	from_date = request.args.get('from_date')
+	to_date = request.args.get('to_date')
+	fahrenheit = request.args.get('fahrenheit')
+	"""Fetching air-data
+	"""
+	oauth = OAuth2Session(client_id, token=session['oauth_object'])
+	sleep(0.5)
+	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + device_type + '/' + device_id + '/air-data/5-min-avg?from=' + from_date + '&to=' + to_date + '&limit=288&desc=false&fahrenheit=' + fahrenheit, headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
+
+
+@app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
-	sleep(1)
+	sleep(0.5)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	refresh_token = session['oauth_object']['refresh_token']
@@ -134,13 +154,13 @@ def automatic_refresh():
 	
 	# Trigger the automatic refresh
 	jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json())
-	sleep(1)
+	sleep(0.5)
 	return jsonify(session['oauth_object'])
 
 
-@app.route("/manual_refresh", methods=["GET"])
+@app.route("/manual-refresh", methods=["GET"])
 def manual_refresh():
-	sleep(1)
+	sleep(0.5)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	token = session['oauth_object']
@@ -152,7 +172,7 @@ def manual_refresh():
 	
 	oauth = OAuth2Session(client_id, token=token)
 	session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
-	sleep(1)
+	sleep(0.5)
 	return jsonify(session['oauth_object'])
 
 
