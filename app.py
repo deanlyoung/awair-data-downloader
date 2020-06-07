@@ -1,6 +1,7 @@
 import os
 from pprint import pformat
 from time import time
+from time import sleep
 
 from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
@@ -70,7 +71,7 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
-	time.sleep(1)
+	sleep(1)
 	""""""
 	return """
 	<h1>Congratulations, you have obtained an OAuth 2 token!</h1>
