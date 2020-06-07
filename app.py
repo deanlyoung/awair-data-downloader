@@ -49,7 +49,7 @@ def demo():
 # Step 2: User authorization, this happens on the provider.
 @app.route("/callback", methods=["GET"])
 def callback():
-	time.sleep(1)
+	sleep(1)
 	code = request.args.get('code')
 	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
@@ -90,7 +90,7 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
-	time.sleep(1)
+	sleep(1)
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -99,7 +99,7 @@ def profile():
 
 @app.route("/automatic_refresh", methods=["GET"])
 def automatic_refresh():
-	time.sleep(1)
+	sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	refresh_token = session['oauth_object']['refresh_token']
@@ -129,7 +129,7 @@ def automatic_refresh():
 
 @app.route("/manual_refresh", methods=["GET"])
 def manual_refresh():
-	time.sleep(1)
+	sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	token = session['oauth_object']
