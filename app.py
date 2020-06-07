@@ -125,6 +125,7 @@ def automatic_refresh():
 	
 	# Trigger the automatic refresh
 	jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json())
+	sleep(1)
 	return jsonify(session['oauth_object'])
 
 
@@ -142,6 +143,7 @@ def manual_refresh():
 	
 	oauth = OAuth2Session(client_id, token=token)
 	session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
+	sleep(1)
 	return jsonify(session['oauth_object'])
 
 
