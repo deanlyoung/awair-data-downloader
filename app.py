@@ -49,6 +49,7 @@ def demo():
 # Step 2: User authorization, this happens on the provider.
 @app.route("/callback", methods=["GET"])
 def callback():
+	time.sleep(1)
 	code = request.args.get('code')
 	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
@@ -69,6 +70,7 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
+	time.sleep(1)
 	""""""
 	return """
 	<h1>Congratulations, you have obtained an OAuth 2 token!</h1>
@@ -88,6 +90,7 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
+	time.sleep(1)
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -96,6 +99,7 @@ def profile():
 
 @app.route("/automatic_refresh", methods=["GET"])
 def automatic_refresh():
+	time.sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	refresh_token = session['oauth_object']['refresh_token']
@@ -106,8 +110,7 @@ def automatic_refresh():
 	
 	extra = {
 		'client_id': client_id,
-		'client_secret': client_secret,
-		'grant_type': 'refresh_token'
+		'client_secret': client_secret
 	}
 	
 	def token_updater(token):
@@ -126,14 +129,14 @@ def automatic_refresh():
 
 @app.route("/manual_refresh", methods=["GET"])
 def manual_refresh():
+	time.sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	token = session['oauth_object']
 	
 	extra = {
 		'client_id': client_id,
-		'client_secret': client_secret,
-		'grant_type': 'refresh_token'
+		'client_secret': client_secret
 	}
 	
 	oauth = OAuth2Session(client_id, token=token)
