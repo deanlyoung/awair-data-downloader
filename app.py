@@ -90,7 +90,7 @@ def menu():
 def profile():
 	"""Fetching a protected resource using an OAuth 2 token.
 	"""
-	oauth = OAuth2Session(client_id, token=session['oauth_object']['access_token'])
+	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
 
 
@@ -114,7 +114,7 @@ def automatic_refresh():
 		session['oauth_object'] = token
 	
 	oauth = OAuth2Session(client_id,
-							token=refresh_token,
+							token=session['oauth_object'],
 							auto_refresh_kwargs=extra,
 							auto_refresh_url=refresh_url,
 							token_updater=token_updater)
@@ -128,7 +128,7 @@ def automatic_refresh():
 def manual_refresh():
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
-	token = session['oauth_object']['refresh_token']
+	token = session['oauth_object']
 	
 	extra = {
 		'client_id': client_id,
