@@ -63,10 +63,10 @@ def callback():
 	sleep(0.5)
 	try:
 		url = 'https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code
-		result = requests.get(url)
-		print(result.json())
-		token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
-		print(token_obj)
+		token_obj = requests.get(url)
+		print(token_obj.json())
+		# token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
+		# print(token_obj)
 		
 		# We use the session as a simple DB for this example.
 		session['oauth_object'] = token_obj
