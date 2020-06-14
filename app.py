@@ -14,8 +14,8 @@ app.secret_key = os.urandom(24)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
-client_id = os.environ.get('CLIENT_ID', None)
-client_secret = os.environ.get('CLIENT_SECRET', None)
+client_id = "u" + os.environ.get('CLIENT_ID', None)
+client_secret = "u" + os.environ.get('CLIENT_SECRET', None)
 redirect_uri = "https://awair-data-downloader.herokuapp.com/callback"
 
 # Uncomment for detailed oauthlib logs
@@ -63,7 +63,7 @@ def callback():
 	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	try:
-		token_obj = oauth.fetch_token(token_url, client_id=client_id, client_secret=client_secret, code=code, authorization_response=request.url)
+		token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
 		
 		# We use the session as a simple DB for this example.
 		session['oauth_object'] = token_obj
