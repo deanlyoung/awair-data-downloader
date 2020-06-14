@@ -231,7 +231,7 @@ def air_data_download():
 			samples_array.append(row)
 		# dtype=dtype
 		structuredArr = np.array(samples_array)
-		np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', comments='')
+		np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', fmt='%s')
 		return jsonify(structuredArr)
 	except Exception as e:
 		print(e)
