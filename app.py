@@ -14,8 +14,8 @@ app.secret_key = os.urandom(24)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
-client_id = "u" + os.environ.get('CLIENT_ID', None)
-client_secret = "u" + os.environ.get('CLIENT_SECRET', None)
+client_id = os.environ.get('CLIENT_ID', None)
+client_secret = os.environ.get('CLIENT_SECRET', None)
 redirect_uri = "https://awair-data-downloader.herokuapp.com/callback"
 
 # Uncomment for detailed oauthlib logs
