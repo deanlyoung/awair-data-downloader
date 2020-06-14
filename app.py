@@ -124,14 +124,13 @@ def air_data():
 	sleep(0.5)
 	devices = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']})
 	devices = devices.json()
-	print(json.dumps(devices))
 	devices_dict = devices['devices']
-	select_opts = {}
+	select_opts = ""
 	for device in devices_dict:
-		select_opts['device'] = '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
+		select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
 	"""Select Device
 	"""
-	print(json.dumps(select_opts))
+	print(select_opts)
 	return """
 	<h2>Choose a device and time range:</h2>
 	<form action="/air-data/download" method="post">
@@ -153,7 +152,7 @@ def air_data():
 		<br><br>
     	<input type="submit" value="Download">
 	</form>
-	""" % str(json.dumps(select_opts))
+	""" % str(select_opts)
 
 
 @app.route("/air-data/download", methods=["POST"])
