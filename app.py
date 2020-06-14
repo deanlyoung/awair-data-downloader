@@ -134,7 +134,7 @@ def air_data():
 	print(json.dumps(select_opts))
 	return """
 	<h2>Choose a device and time range:</h2>
-	<form action="{{ url_for('air_data_download') }}" method="post">
+	<form action="/air-data/download" method="post">
     	<label for="device_uuid">Select Device:<br>
 			<select id="device_uuid" name="device_uuid" required>
 				%s 
