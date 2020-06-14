@@ -7,6 +7,7 @@ from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
 import requests
 from requests_oauthlib import OAuth2Session
+import numpy as np
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -122,8 +123,7 @@ def air_data():
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	devices = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']})
-	devices = devices.json()
+	devices = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
 	devices_dict = devices['devices']
 	select_opts = ""
 	for device in devices_dict:
@@ -177,7 +177,37 @@ def air_data_download():
 	fahrenheit = request.form['temp_unit']
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
+	air_data = oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+	samples = air_data['data']
+	# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
+	dtype = [('timestamp', (np.str_, 24)), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
+	samples_array = []
+	for sample in samples:
+		row = []
+		row['0'] = str(sample['timestamp'])
+		row['1'] = str(sample['score'])
+		sensors = sample['sensors']
+		for sensor in sensors:
+			if sensor['comp'] = "temp":
+				row['2'] = str(sensor['value'])
+			elif sensor['comp'] = "humid":
+				row['3'] = str(sensor['value'])
+			elif sensor['comp'] = "co2":
+				row['4'] = str(sensor['value'])
+			elif sensor['comp'] = "voc":
+				row['5'] = str(sensor['value'])
+			elif sensor['comp'] = "pm25":
+				row['6'] = str(sensor['value'])
+			elif sensor['comp'] = "lux":
+				row['7'] = str(sensor['value'])
+			elif sensor['comp'] = "spl_a":
+				row['8'] = str(sensor['value'])
+			else:
+				print("unknown sensor: " + sensor['comp'])
+		samples_array.append(row)
+	structuredArr = np.array(samples_array, dtype=dtype)
+	np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', comments='')
+	return jsonify(structuredArr)
 
 
 @app.route("/automatic-refresh", methods=["GET"])
