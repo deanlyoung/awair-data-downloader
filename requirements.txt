@@ -2,4 +2,3 @@ Flask
 gunicorn
 requests
 requests_oauthlib
-numpy
