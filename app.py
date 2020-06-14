@@ -81,6 +81,9 @@ def menu():
 		<li><a href="/profile"> Get account profile</a></li>
 		<li><a href="/devices"> Get account devices</a></li>
 		<li><a href="/air-data"> Get device air-data</a></li>
+	</ul>
+	<br><br>
+	<ul>
 		<li><a href="/automatic-refresh"> Implicitly refresh the token</a></li>
 		<li><a href="/manual-refresh"> Explicitly refresh the token</a></li>
 		<li><a href="/"> Re-Authenticate</a></li>
@@ -120,7 +123,7 @@ def air_data():
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
 	devices = jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
-	devices_dict = json.loads(devices.devices)
+	devices_dict = json.loads(devices['devices'])
 	select_opts = {}
 	for device in devices_dict:
 		select_opts['device'] = '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
