@@ -69,7 +69,7 @@ def callback():
 		# print(token_obj)
 		
 		# We use the session as a simple DB for this example.
-		session['oauth_object'] = token_obj
+		session['oauth_object'] = jsonify(token_obj)
 		return redirect(url_for('.menu'))
 	except Exception as e:
 		print(e)
