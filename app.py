@@ -51,7 +51,6 @@ def demo():
 # Step 2: User authorization, this happens on the provider.
 @app.route("/callback", methods=["GET"])
 def callback():
-	sleep(1)
 	code = request.args.get('code')
 	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
@@ -60,8 +59,8 @@ def callback():
 	callback URL. With this redirection comes an authorization code included
 	in the redirect URL. We will use that to obtain an access token.
 	"""
-	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
+	sleep(0.5)
 	try:
 		token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, include_client_id=True, authorization_response=request.url)
 		
@@ -74,7 +73,6 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
-	sleep(1)
 	"""Main menu
 	"""
 	return """
@@ -100,7 +98,6 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
-	sleep(1)
 	"""Fetching profile data
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -115,7 +112,6 @@ def profile():
 
 @app.route("/devices", methods=["GET"])
 def devices():
-	sleep(1)
 	"""Fetching device list
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -130,7 +126,6 @@ def devices():
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
-	sleep(1)
 	"""Fetch device list
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -172,7 +167,6 @@ def air_data():
 
 @app.route("/air-data/download", methods=["POST"])
 def air_data_download():
-	sleep(1)
 	# used with GET method
 	# device_type = request.args.get('device_type')
 	# device_id = request.args.get('device_id')
@@ -230,7 +224,6 @@ def air_data_download():
 
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
-	sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	refresh_token = session['oauth_object']['refresh_token']
@@ -264,7 +257,6 @@ def automatic_refresh():
 
 @app.route("/manual-refresh", methods=["GET"])
 def manual_refresh():
-	sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	token = session['oauth_object']
