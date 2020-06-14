@@ -2,6 +2,7 @@ import os
 from pprint import pformat
 from time import time, sleep
 from datetime import datetime, timedelta
+import json
 from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
 import requests
@@ -162,18 +163,17 @@ def air_data_download():
 	# used with POST method
 	"""Fetching air-data
 	"""
-	def air_data_download():
-		device_uuid = request.form['device_uuid']
-		device_type = device_uuid.split("_")[0]
-		device_id = device_uuid.split("_")[1]
-		from_date = request.form['date']
-		temp_date = datetime.strptime(from_date, "%Y-%m-%d")
-		add_day = temp_date + timedelta(days=1)
-		to_date = datetime.strftime(add_day, "%Y-%m-%d")
-		fahrenheit = request.form['temp_unit']
-		oauth = OAuth2Session(client_id, token=session['oauth_object'])
-		sleep(0.5)
-		return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
+	device_uuid = request.form['device_uuid']
+	device_type = device_uuid.split("_")[0]
+	device_id = device_uuid.split("_")[1]
+	from_date = request.form['date']
+	temp_date = datetime.strptime(from_date, "%Y-%m-%d")
+	add_day = temp_date + timedelta(days=1)
+	to_date = datetime.strftime(add_day, "%Y-%m-%d")
+	fahrenheit = request.form['temp_unit']
+	oauth = OAuth2Session(client_id, token=session['oauth_object'])
+	sleep(0.5)
+	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
 
 
 @app.route("/automatic-refresh", methods=["GET"])
