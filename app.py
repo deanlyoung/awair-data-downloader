@@ -30,8 +30,6 @@ token_url = "https://oauth2.awair.is/v2/token"
 refresh_url = token_url # True for Awair but not all providers.
 scope = ""
 
-session['oauth_object'] = ''
-
 @app.route("/")
 def demo():
 	"""Step 1: User Authorization.
@@ -53,6 +51,7 @@ def demo():
 @app.route("/callback", methods=["GET"])
 def callback():
 	sleep(1)
+	session['oauth_object'] = 0
 	code = request.args.get('code')
 	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
