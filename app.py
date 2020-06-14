@@ -70,7 +70,7 @@ def callback():
 		
 		# We use the session as a simple DB for this example.
 		session['oauth_object'] = token_obj.json()
-		return redirect(url_for('.menu'))
+		return redirect('/menu')
 	except Exception as e:
 		print(e)
 		return redirect('/')
@@ -104,6 +104,7 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
+	sleep(1)
 	"""Fetching profile data
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -111,13 +112,15 @@ def profile():
 	prof = ""
 	try:
 		prof = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		return jsonify(prof)
 	except Exception as e:
 		print(e)
-	return jsonify(prof)
+		return redirect('/profile')
 
 
 @app.route("/devices", methods=["GET"])
 def devices():
+	sleep(1)
 	"""Fetching device list
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -125,13 +128,15 @@ def devices():
 	devs = ""
 	try:
 		devs = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		return jsonify(devs)
 	except Exception as e:
 		print(e)
-	return jsonify(devs)
+		return redirect('/devices')
 
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
+	sleep(1)
 	"""Fetch device list
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -145,34 +150,36 @@ def air_data():
 		"""Select Device
 		"""
 		print(select_opts)
+		return """
+		<h2>Choose a device and time range:</h2>
+		<form action="/air-data/download" method="post">
+	    	<label for="device_uuid">Select Device:<br>
+				<select id="device_uuid" name="device_uuid" required>
+					%s 
+				</select>
+			</label>
+			<br><br>
+			<label for="device">Choose Date (UTC):<br>
+				<input type="date" name="date" required pattern="\d{4}-\d{2}-\d{2}">
+			</label>
+			<br><br>
+			<span>Temperature Unit:</span><br>
+			<input type="radio" id="temp_f" name="temp_unit" value="true">
+			<label for="temp_f">Fahrenheit</label><br>
+			<input type="radio" id="temp_c" name="temp_unit" value="false">
+			<label for="temp_c">Celsius</label>
+			<br><br>
+	    	<input type="submit" value="Download">
+		</form>
+		""" % str(select_opts)
 	except Exception as e:
 		print(e)
-	return """
-	<h2>Choose a device and time range:</h2>
-	<form action="/air-data/download" method="post">
-    	<label for="device_uuid">Select Device:<br>
-			<select id="device_uuid" name="device_uuid" required>
-				%s 
-			</select>
-		</label>
-		<br><br>
-		<label for="device">Choose Date (UTC):<br>
-			<input type="date" name="date" required pattern="\d{4}-\d{2}-\d{2}">
-		</label>
-		<br><br>
-		<span>Temperature Unit:</span><br>
-		<input type="radio" id="temp_f" name="temp_unit" value="true">
-		<label for="temp_f">Fahrenheit</label><br>
-		<input type="radio" id="temp_c" name="temp_unit" value="false">
-		<label for="temp_c">Celsius</label>
-		<br><br>
-    	<input type="submit" value="Download">
-	</form>
-	""" % str(select_opts)
+		return redirect('/air-data')
 
 
 @app.route("/air-data/download", methods=["POST"])
 def air_data_download():
+	sleep(1)
 	# used with GET method
 	# device_type = request.args.get('device_type')
 	# device_id = request.args.get('device_id')
@@ -223,9 +230,10 @@ def air_data_download():
 			samples_array.append(row)
 		structuredArr = np.array(samples_array, dtype=dtype)
 		np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', comments='')
+		return jsonify(structuredArr)
 	except Exception as e:
 		print(e)
-	return jsonify(structuredArr)
+		return redirect('/air-data/download')
 
 
 @app.route("/automatic-refresh", methods=["GET"])
@@ -256,9 +264,10 @@ def automatic_refresh():
 	refresh = ""
 	try:
 		refresh = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json()
+		return jsonify(refresh)
 	except Exception as e:
 		print(e)
-	return jsonify(refresh)
+		return redirect('/automatic-refresh')
 
 
 @app.route("/manual-refresh", methods=["GET"])
@@ -276,9 +285,10 @@ def manual_refresh():
 	sleep(0.5)
 	try:
 		session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
+		return jsonify(session['oauth_object'])
 	except Exception as e:
 		print(e)
-	return jsonify(session['oauth_object'])
+		return redirect('/manual-refresh')
 
 
 if __name__ == "__main__":
