@@ -67,9 +67,11 @@ def callback():
 		
 		# We use the session as a simple DB for this example.
 		session['oauth_object'] = token_obj
+		return redirect(url_for('.menu'))
 	except Exception as e:
 		print(e)
-	return redirect(url_for('.menu'))
+		return redirect(url_for('.'))
+	
 
 
 @app.route("/menu", methods=["GET"])
