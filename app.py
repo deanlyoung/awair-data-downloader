@@ -64,8 +64,8 @@ def callback():
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	try:
 		token_obj = oauth.fetch_token(token_url, client_id=client_id, client_secret=client_secret, code=code, authorization_response=request.url)
-	except:
-		print("error: " + token_obj.text())
+	except Exception as e:
+		print(e)
 	
 	# We use the session as a simple DB for this example.
 	session['oauth_object'] = token_obj
