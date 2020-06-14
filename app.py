@@ -151,7 +151,7 @@ def air_data():
 
 
 @app.route("/air-data/download", methods=["POST"])
-def air_data():
+def air_data_download():
 	sleep(1)
 	# used with GET method
 	# device_type = request.args.get('device_type')
