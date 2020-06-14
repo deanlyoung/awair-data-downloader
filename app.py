@@ -230,6 +230,7 @@ def air_data_download():
 					print("unknown sensor: " + sensor['comp'])
 			samples_array.append(row)
 		# dtype=dtype
+		samples_array = json.loads(samples_array)
 		structuredArr = np.array(samples_array)
 		np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', fmt='%s')
 		return jsonify(structuredArr)
