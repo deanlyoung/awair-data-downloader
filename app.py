@@ -107,7 +107,7 @@ def profile():
 
 @app.route("/devices", methods=["GET"])
 def devices():
-	sleep(0.5)
+	sleep(1)
 	"""Fetching device list
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -123,7 +123,7 @@ def air_data():
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
 	devices = jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
-	print(devices['devices'])
+	print(devices)
 	devices_dict = devices['devices']
 	select_opts = {}
 	for device in devices_dict:
@@ -204,10 +204,9 @@ def automatic_refresh():
 							auto_refresh_kwargs=extra,
 							auto_refresh_url=refresh_url,
 							token_updater=token_updater)
-	
+	sleep(0.5)
 	# Trigger the automatic refresh
 	jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json())
-	sleep(0.5)
 	return jsonify(session['oauth_object'])
 
 
@@ -224,8 +223,8 @@ def manual_refresh():
 	}
 	
 	oauth = OAuth2Session(client_id, token=token)
-	session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
 	sleep(0.5)
+	session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
 	return jsonify(session['oauth_object'])
 
 
