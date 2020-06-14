@@ -3,11 +3,11 @@ from pprint import pformat
 from time import time, sleep
 from datetime import datetime, timedelta
 import json
+import numpy as np
 from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
 import requests
 from requests_oauthlib import OAuth2Session
-import numpy as np
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
