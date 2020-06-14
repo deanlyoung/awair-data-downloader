@@ -30,6 +30,8 @@ token_url = "https://oauth2.awair.is/v2/token"
 refresh_url = token_url # True for Awair but not all providers.
 scope = ""
 
+session['oauth_object'] = ''
+
 @app.route("/")
 def demo():
 	"""Step 1: User Authorization.
