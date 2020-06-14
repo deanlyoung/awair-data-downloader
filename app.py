@@ -51,7 +51,6 @@ def demo():
 @app.route("/callback", methods=["GET"])
 def callback():
 	sleep(1)
-	session['oauth_object'] = 0
 	code = request.args.get('code')
 	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
