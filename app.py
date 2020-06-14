@@ -62,7 +62,9 @@ def callback():
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	sleep(0.5)
 	try:
-		token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url) # include_client_id=True,
+		r = requests.get('https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code)
+		print(r.text())
+		token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
 		print(token_obj)
 		
 		# We use the session as a simple DB for this example.
