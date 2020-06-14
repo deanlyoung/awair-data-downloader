@@ -1,8 +1,7 @@
 import os
 from pprint import pformat
-from time import time
-from time import sleep
-
+from time import time, sleep
+from datetime import datetime, timedelta
 from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
 import requests
@@ -50,7 +49,7 @@ def demo():
 # Step 2: User authorization, this happens on the provider.
 @app.route("/callback", methods=["GET"])
 def callback():
-	sleep(0.5)
+	sleep(1)
 	code = request.args.get('code')
 	print('code: ' + code)
 	""" Step 3: Retrieving an access token.
@@ -71,7 +70,7 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
-	sleep(0.5)
+	sleep(1)
 	"""Main menu
 	"""
 	return """
@@ -94,7 +93,7 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
-	sleep(0.5)
+	sleep(1)
 	"""Fetching profile data
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
@@ -114,22 +113,72 @@ def devices():
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
-	sleep(0.5)
-	device_type = request.args.get('device_type')
-	device_id = request.args.get('device_id')
-	from_date = request.args.get('from_date')
-	to_date = request.args.get('to_date')
-	fahrenheit = request.args.get('fahrenheit')
-	"""Fetching air-data
+	sleep(1)
+	"""Fetch device list
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + device_type + '/' + device_id + '/air-data/5-min-avg?from=' + from_date + '&to=' + to_date + '&limit=288&desc=false&fahrenheit=' + fahrenheit, headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
+	devices = jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
+	devices_dict = json.loads(devices.devices)
+	select_opts = {}
+	for device in devices_dict:
+		select_opts['device'] = '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
+	"""Select Device
+	"""
+	print(json.dumps(select_opts))
+	return """
+	<h2>Choose a device and time range:</h2>
+	<form action="{{ url_for('air_data_download') }}" method="post">
+    	<label for="device_uuid">Select Device:<br>
+			<select id="device_uuid" name="device_uuid" required>
+				%s 
+			</select>
+		</label>
+		<br><br>
+		<label for="device">Choose Date (UTC):<br>
+			<input type="date" name="date" required pattern="\d{4}-\d{2}-\d{2}">
+		</label>
+		<br><br>
+		<span>Temperature Unit:</span><br>
+		<input type="radio" id="temp_f" name="temp_unit" value="true">
+		<label for="temp_f">Fahrenheit</label><br>
+		<input type="radio" id="temp_c" name="temp_unit" value="false">
+		<label for="temp_c">Celsius</label>
+		<br><br>
+    	<input type="submit" value="Download">
+	</form>
+	""" % str(json.dumps(select_opts))
+
+
+@app.route("/air-data/download", methods=["POST"])
+def air_data():
+	sleep(1)
+	# used with GET method
+	# device_type = request.args.get('device_type')
+	# device_id = request.args.get('device_id')
+	# from_date = request.args.get('from_date')
+	# to_date = request.args.get('to_date')
+	# fahrenheit = request.args.get('fahrenheit')
+	# used with POST method
+	"""Fetching air-data
+	"""
+	def air_data_download():
+		device_uuid = request.form['device_uuid']
+		device_type = device_uuid.split("_")[0]
+		device_id = device_uuid.split("_")[1]
+		from_date = request.form['date']
+		temp_date = datetime.strptime(from_date, "%Y-%m-%d")
+		add_day = temp_date + timedelta(days=1)
+		to_date = datetime.strftime(add_day, "%Y-%m-%d")
+		fahrenheit = request.form['temp_unit']
+		oauth = OAuth2Session(client_id, token=session['oauth_object'])
+		sleep(0.5)
+		return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
 
 
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
-	sleep(0.5)
+	sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	refresh_token = session['oauth_object']['refresh_token']
@@ -160,7 +209,7 @@ def automatic_refresh():
 
 @app.route("/manual-refresh", methods=["GET"])
 def manual_refresh():
-	sleep(0.5)
+	sleep(1)
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	token = session['oauth_object']
