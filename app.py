@@ -204,7 +204,7 @@ def air_data_download():
 		air_data = requests.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
 		samples = air_data['data']
 		# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
-		dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
+		# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
 		samples_array = []
 		for sample in samples:
 			row = [None] * 9
@@ -229,7 +229,8 @@ def air_data_download():
 				else:
 					print("unknown sensor: " + sensor['comp'])
 			samples_array.append(row)
-		structuredArr = np.array(samples_array, dtype=dtype)
+		# dtype=dtype
+		structuredArr = np.array(samples_array)
 		np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', comments='')
 		return jsonify(structuredArr)
 	except Exception as e:
