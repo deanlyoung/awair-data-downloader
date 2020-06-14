@@ -63,7 +63,7 @@ def callback():
 	
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	try:
-		token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
+		token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, include_client_id=True, authorization_response=request.url)
 		
 		# We use the session as a simple DB for this example.
 		session['oauth_object'] = token_obj
