@@ -122,8 +122,9 @@ def air_data():
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	devices = jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
-	print(devices)
+	devices = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']})
+	devices = devices.json()
+	print(json.dumps(devices))
 	devices_dict = devices['devices']
 	select_opts = {}
 	for device in devices_dict:
