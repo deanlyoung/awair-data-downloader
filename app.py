@@ -70,7 +70,7 @@ def callback():
 		return redirect(url_for('.menu'))
 	except Exception as e:
 		print(e)
-		return redirect(url_for('.'))
+		return redirect('/')
 	
 
 
