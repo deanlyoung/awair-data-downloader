@@ -203,28 +203,28 @@ def air_data_download():
 		air_data = requests.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
 		samples = air_data['data']
 		# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
-		dtype = [('timestamp', (np.str_, 10)), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
+		dtype = [('timestamp', np.datetime64), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
 		samples_array = []
 		for sample in samples:
 			row = [None] * 9
-			row[0] = str(sample['timestamp'])
-			row[1] = str(sample['score'])
+			row[0] = sample['timestamp']
+			row[1] = int(sample['score'])
 			sensors = sample['sensors']
 			for sensor in sensors:
 				if sensor['comp'] == "temp":
-					row[2] = str(sensor['value'])
+					row[2] = float(sensor['value'])
 				elif sensor['comp'] == "humid":
-					row[3] = str(sensor['value'])
+					row[3] = float(sensor['value'])
 				elif sensor['comp'] == "co2":
-					row[4] = str(sensor['value'])
+					row[4] = float(sensor['value'])
 				elif sensor['comp'] == "voc":
-					row[5] = str(sensor['value'])
+					row[5] = float(sensor['value'])
 				elif sensor['comp'] == "pm25":
-					row[6] = str(sensor['value'])
+					row[6] = float(sensor['value'])
 				elif sensor['comp'] == "lux":
-					row[7] = str(sensor['value'])
+					row[7] = float(sensor['value'])
 				elif sensor['comp'] == "spl_a":
-					row[8] = str(sensor['value'])
+					row[8] = float(sensor['value'])
 				else:
 					print("unknown sensor: " + sensor['comp'])
 			samples_array.append(row)
