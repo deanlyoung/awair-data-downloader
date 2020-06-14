@@ -206,7 +206,7 @@ def air_data_download():
 		dtype = [('timestamp', (np.str_, 24)), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
 		samples_array = []
 		for sample in samples:
-			row = []
+			row = [None] * 9
 			row[0] = str(sample['timestamp'])
 			row[1] = str(sample['score'])
 			sensors = sample['sensors']
