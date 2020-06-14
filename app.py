@@ -79,6 +79,7 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
+	sleep(1)
 	"""Main menu
 	"""
 	return """
