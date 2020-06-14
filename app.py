@@ -111,7 +111,7 @@ def profile():
 	sleep(0.5)
 	prof = ""
 	try:
-		prof = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		prof = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
 		return jsonify(prof)
 	except Exception as e:
 		print(e)
@@ -127,7 +127,7 @@ def devices():
 	sleep(0.5)
 	devs = ""
 	try:
-		devs = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
 		return jsonify(devs)
 	except Exception as e:
 		print(e)
@@ -143,7 +143,7 @@ def air_data():
 	sleep(0.5)
 	select_opts = ""
 	try:
-		devices = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
 		devices_dict = devices['devices']
 		for device in devices_dict:
 			select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
@@ -200,7 +200,7 @@ def air_data_download():
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
 	try:
-		air_data = oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		air_data = requests.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
 		samples = air_data['data']
 		# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
 		dtype = [('timestamp', (np.str_, 10)), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
