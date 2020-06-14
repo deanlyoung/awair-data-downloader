@@ -64,12 +64,11 @@ def callback():
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	try:
 		token_obj = oauth.fetch_token(token_url, client_id=client_id, client_secret=client_secret, code=code, authorization_response=request.url)
+		
+		# We use the session as a simple DB for this example.
+		session['oauth_object'] = token_obj
 	except Exception as e:
 		print(e)
-	
-	# We use the session as a simple DB for this example.
-	session['oauth_object'] = token_obj
-	
 	return redirect(url_for('.menu'))
 
 
@@ -106,7 +105,12 @@ def profile():
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
+	prof = ""
+	try:
+		prof = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+	except Exception as e:
+		print(e)
+	return jsonify(prof)
 
 
 @app.route("/devices", methods=["GET"])
@@ -116,7 +120,12 @@ def devices():
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	return jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json())
+	devs = ""
+	try:
+		devs = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+	except Exception as e:
+		print(e)
+	return jsonify(devs)
 
 
 @app.route("/air-data", methods=["GET"])
@@ -126,14 +135,17 @@ def air_data():
 	"""
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	devices = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
-	devices_dict = devices['devices']
 	select_opts = ""
-	for device in devices_dict:
-		select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
-	"""Select Device
-	"""
-	print(select_opts)
+	try:
+		devices = oauth.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		devices_dict = devices['devices']
+		for device in devices_dict:
+			select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
+		"""Select Device
+		"""
+		print(select_opts)
+	except Exception as e:
+		print(e)
 	return """
 	<h2>Choose a device and time range:</h2>
 	<form action="/air-data/download" method="post">
@@ -180,36 +192,39 @@ def air_data_download():
 	fahrenheit = request.form['temp_unit']
 	oauth = OAuth2Session(client_id, token=session['oauth_object'])
 	sleep(0.5)
-	air_data = oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
-	samples = air_data['data']
-	# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
-	dtype = [('timestamp', (np.str_, 24)), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
-	samples_array = []
-	for sample in samples:
-		row = []
-		row['0'] = str(sample['timestamp'])
-		row['1'] = str(sample['score'])
-		sensors = sample['sensors']
-		for sensor in sensors:
-			if sensor['comp'] == "temp":
-				row['2'] = str(sensor['value'])
-			elif sensor['comp'] == "humid":
-				row['3'] = str(sensor['value'])
-			elif sensor['comp'] == "co2":
-				row['4'] = str(sensor['value'])
-			elif sensor['comp'] == "voc":
-				row['5'] = str(sensor['value'])
-			elif sensor['comp'] == "pm25":
-				row['6'] = str(sensor['value'])
-			elif sensor['comp'] == "lux":
-				row['7'] = str(sensor['value'])
-			elif sensor['comp'] == "spl_a":
-				row['8'] = str(sensor['value'])
-			else:
-				print("unknown sensor: " + sensor['comp'])
-		samples_array.append(row)
-	structuredArr = np.array(samples_array, dtype=dtype)
-	np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', comments='')
+	try:
+		air_data = oauth.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		samples = air_data['data']
+		# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
+		dtype = [('timestamp', (np.str_, 24)), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
+		samples_array = []
+		for sample in samples:
+			row = []
+			row['0'] = str(sample['timestamp'])
+			row['1'] = str(sample['score'])
+			sensors = sample['sensors']
+			for sensor in sensors:
+				if sensor['comp'] == "temp":
+					row['2'] = str(sensor['value'])
+				elif sensor['comp'] == "humid":
+					row['3'] = str(sensor['value'])
+				elif sensor['comp'] == "co2":
+					row['4'] = str(sensor['value'])
+				elif sensor['comp'] == "voc":
+					row['5'] = str(sensor['value'])
+				elif sensor['comp'] == "pm25":
+					row['6'] = str(sensor['value'])
+				elif sensor['comp'] == "lux":
+					row['7'] = str(sensor['value'])
+				elif sensor['comp'] == "spl_a":
+					row['8'] = str(sensor['value'])
+				else:
+					print("unknown sensor: " + sensor['comp'])
+			samples_array.append(row)
+		structuredArr = np.array(samples_array, dtype=dtype)
+		np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', comments='')
+	except Exception as e:
+		print(e)
 	return jsonify(structuredArr)
 
 
@@ -239,8 +254,12 @@ def automatic_refresh():
 							token_updater=token_updater)
 	sleep(0.5)
 	# Trigger the automatic refresh
-	jsonify(oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json())
-	return jsonify(session['oauth_object'])
+	refresh = ""
+	try:
+		refresh = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json()
+	except Exception as e:
+		print(e)
+	return jsonify(refresh)
 
 
 @app.route("/manual-refresh", methods=["GET"])
@@ -257,7 +276,10 @@ def manual_refresh():
 	
 	oauth = OAuth2Session(client_id, token=token)
 	sleep(0.5)
-	session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
+	try:
+		session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
+	except Exception as e:
+		print(e)
 	return jsonify(session['oauth_object'])
 
 
