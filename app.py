@@ -207,24 +207,24 @@ def air_data_download():
 		samples_array = []
 		for sample in samples:
 			row = []
-			row['0'] = str(sample['timestamp'])
-			row['1'] = str(sample['score'])
+			row[0] = str(sample['timestamp'])
+			row[1] = str(sample['score'])
 			sensors = sample['sensors']
 			for sensor in sensors:
 				if sensor['comp'] == "temp":
-					row['2'] = str(sensor['value'])
+					row[2] = str(sensor['value'])
 				elif sensor['comp'] == "humid":
-					row['3'] = str(sensor['value'])
+					row[3] = str(sensor['value'])
 				elif sensor['comp'] == "co2":
-					row['4'] = str(sensor['value'])
+					row[4] = str(sensor['value'])
 				elif sensor['comp'] == "voc":
-					row['5'] = str(sensor['value'])
+					row[5] = str(sensor['value'])
 				elif sensor['comp'] == "pm25":
-					row['6'] = str(sensor['value'])
+					row[6] = str(sensor['value'])
 				elif sensor['comp'] == "lux":
-					row['7'] = str(sensor['value'])
+					row[7] = str(sensor['value'])
 				elif sensor['comp'] == "spl_a":
-					row['8'] = str(sensor['value'])
+					row[8] = str(sensor['value'])
 				else:
 					print("unknown sensor: " + sensor['comp'])
 			samples_array.append(row)
