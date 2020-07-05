@@ -78,9 +78,9 @@ def callback():
 @app.route("/menu", methods=["GET"])
 def menu():
 	count = 1000
-	while not session['oauth_object'] and count:
-		print(count)
-		count -= 1
+		while not session['oauth_object'] and count:
+			print(count)
+			count -= 1
 	creds = session['oauth_object']
 	"""Main menu
 	"""
@@ -108,9 +108,9 @@ def menu():
 @app.route("/profile", methods=["GET"])
 def profile():
 	count = 1000
-	while not session['oauth_object'] and count:
-		print(count)
-		count -= 1
+		while not session['oauth_object'] and count:
+			print(count)
+			count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	"""Fetching profile data
@@ -128,9 +128,9 @@ def profile():
 @app.route("/devices", methods=["GET"])
 def devices():
 	count = 1000
-	while not session['oauth_object'] and count:
-		print(count)
-		count -= 1
+		while not session['oauth_object'] and count:
+			print(count)
+			count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	"""Fetching device list
@@ -148,9 +148,9 @@ def devices():
 @app.route("/air-data", methods=["GET"])
 def air_data():
 	count = 1000
-	while not session['oauth_object'] and count:
-		print(count)
-		count -= 1
+		while not session['oauth_object'] and count:
+			print(count)
+			count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	"""Fetch device list
@@ -195,9 +195,9 @@ def air_data():
 @app.route("/air-data/download", methods=["POST"]) # "GET", 
 def air_data_download():
 	count = 1000
-	while not session['oauth_object'] and count:
-		print(count)
-		count -= 1
+		while not session['oauth_object'] and count:
+			print(count)
+			count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	# used with GET method
@@ -218,8 +218,9 @@ def air_data_download():
 	to_date = datetime.strftime(add_day, "%Y-%m-%d")
 	fahrenheit = request.form['temp_unit']
 	oauth = OAuth2Session(client_id, token=oauth_obj)
+	air_data_url = 'https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit)
 	try:
-		air_data = requests.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + bearer_token}).json()
+		air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
 		samples = air_data['data']
 		# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
 		# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
@@ -249,7 +250,7 @@ def air_data_download():
 			samples_array.append(row)
 		samples_array = json.loads(samples_array)
 		
-		return jsonify()
+		return jsonify(samples_array)
 	except Exception as e:
 		print(e)
 		return redirect('/air-data/download')
@@ -258,9 +259,9 @@ def air_data_download():
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
 	count = 1000
-	while not session['oauth_object'] and count:
-		print(count)
-		count -= 1
+		while not session['oauth_object'] and count:
+			print(count)
+			count -= 1
 	oauth_obj = session['oauth_object']
 	refresh_token = oauth_obj['refresh_token']
 	"""Refreshing an OAuth 2 token using a refresh token.
@@ -297,9 +298,9 @@ def automatic_refresh():
 @app.route("/manual-refresh", methods=["GET"])
 def manual_refresh():
 	count = 1000
-	while not session['oauth_object'] and count:
-		print(count)
-		count -= 1
+		while not session['oauth_object'] and count:
+			print(count)
+			count -= 1
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	token = session['oauth_object']
