@@ -77,6 +77,9 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
+	count = 1000
+	while not session['oauth_object'] and count:
+		count -= 1
 	creds = session['oauth_object']
 	"""Main menu
 	"""
@@ -103,6 +106,9 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
+	count = 1000
+	while not session['oauth_object'] and count:
+		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	"""Fetching profile data
@@ -119,6 +125,9 @@ def profile():
 
 @app.route("/devices", methods=["GET"])
 def devices():
+	count = 1000
+	while not session['oauth_object'] and count:
+		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	"""Fetching device list
@@ -135,6 +144,9 @@ def devices():
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
+	count = 1000
+	while not session['oauth_object'] and count:
+		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	"""Fetch device list
@@ -178,6 +190,9 @@ def air_data():
 
 @app.route("/air-data/download", methods=["GET", "POST"])
 def air_data_download():
+	count = 1000
+	while not session['oauth_object'] and count:
+		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
 	# used with GET method
@@ -237,6 +252,9 @@ def air_data_download():
 
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
+	count = 1000
+	while not session['oauth_object'] and count:
+		count -= 1
 	oauth_obj = session['oauth_object']
 	refresh_token = oauth_obj['refresh_token']
 	"""Refreshing an OAuth 2 token using a refresh token.
@@ -272,6 +290,9 @@ def automatic_refresh():
 
 @app.route("/manual-refresh", methods=["GET"])
 def manual_refresh():
+	count = 1000
+	while not session['oauth_object'] and count:
+		count -= 1
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	token = session['oauth_object']
