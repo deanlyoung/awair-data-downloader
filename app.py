@@ -3,7 +3,7 @@ from pprint import pformat
 from time import time, sleep
 from datetime import datetime, timedelta
 import json
-import numpy as np
+import csv
 from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
 import requests
@@ -60,7 +60,6 @@ def callback():
 	in the redirect URL. We will use that to obtain an access token.
 	"""
 	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
-	sleep(0.5)
 	try:
 		url = 'https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code
 		token_obj = requests.get(url)
@@ -74,12 +73,11 @@ def callback():
 	except Exception as e:
 		print(e)
 		return redirect('/')
-	
 
 
 @app.route("/menu", methods=["GET"])
 def menu():
-	sleep(1)
+	creds = session['oauth_object']
 	"""Main menu
 	"""
 	return """
@@ -100,20 +98,20 @@ def menu():
 	<pre>
 	%s
 	</pre>
-	""" % pformat(session['oauth_object'], indent=4)
+	""" % pformat(creds, indent=4)
 
 
 @app.route("/profile", methods=["GET"])
 def profile():
-	sleep(1)
+	oauth_obj = session['oauth_object']
+	bearer_token = oauth_obj['access_token']
 	"""Fetching profile data
 	"""
-	oauth = OAuth2Session(client_id, token=session['oauth_object'])
-	sleep(0.5)
+	oauth = OAuth2Session(client_id, token=oauth_obj)
 	prof = ""
 	try:
-		prof = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
-		return jsonify(prof)
+		profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token}).json()
+		return jsonify(profile)
 	except Exception as e:
 		print(e)
 		return redirect('/profile')
@@ -121,14 +119,14 @@ def profile():
 
 @app.route("/devices", methods=["GET"])
 def devices():
-	sleep(1)
+	oauth_obj = session['oauth_object']
+	bearer_token = oauth_obj['access_token']
 	"""Fetching device list
 	"""
-	oauth = OAuth2Session(client_id, token=session['oauth_object'])
-	sleep(0.5)
+	oauth = OAuth2Session(client_id, token=oauth_obj)
 	devs = ""
 	try:
-		devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
 		return jsonify(devs)
 	except Exception as e:
 		print(e)
@@ -137,14 +135,14 @@ def devices():
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
-	sleep(1)
+	oauth_obj = session['oauth_object']
+	bearer_token = oauth_obj['access_token']
 	"""Fetch device list
 	"""
-	oauth = OAuth2Session(client_id, token=session['oauth_object'])
-	sleep(0.5)
+	oauth = OAuth2Session(client_id, token=oauth_obj)
 	select_opts = ""
 	try:
-		devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
 		devices_dict = devices['devices']
 		for device in devices_dict:
 			select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
@@ -180,7 +178,8 @@ def air_data():
 
 @app.route("/air-data/download", methods=["GET", "POST"])
 def air_data_download():
-	sleep(1)
+	oauth_obj = session['oauth_object']
+	bearer_token = oauth_obj['access_token']
 	# used with GET method
 	# device_type = request.args.get('device_type')
 	# device_id = request.args.get('device_id')
@@ -198,10 +197,9 @@ def air_data_download():
 	add_day = temp_date + timedelta(days=1)
 	to_date = datetime.strftime(add_day, "%Y-%m-%d")
 	fahrenheit = request.form['temp_unit']
-	oauth = OAuth2Session(client_id, token=session['oauth_object'])
-	sleep(0.5)
+	oauth = OAuth2Session(client_id, token=oauth_obj)
 	try:
-		air_data = requests.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + session['oauth_object']['access_token']}).json()
+		air_data = requests.get('https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit), headers={'Authorization': 'Bearer ' + bearer_token}).json()
 		samples = air_data['data']
 		# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
 		# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
@@ -229,11 +227,9 @@ def air_data_download():
 				else:
 					print("unknown sensor: " + sensor['comp'])
 			samples_array.append(row)
-		# dtype=dtype
 		samples_array = json.loads(samples_array)
-		structuredArr = np.array(samples_array)
-		np.savetxt('awair_data_' + str(from_date) + '.csv', structuredArr, delimiter=',', fmt='%s')
-		return jsonify(structuredArr)
+		
+		return jsonify()
 	except Exception as e:
 		print(e)
 		return redirect('/air-data/download')
@@ -241,9 +237,10 @@ def air_data_download():
 
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
+	oauth_obj = session['oauth_object']
+	refresh_token = oauth_obj['refresh_token']
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
-	refresh_token = session['oauth_object']['refresh_token']
 	# We force an expiration by setting expired at in the past.
 	# This will trigger an automatic refresh next time we interact with
 	# Awair's API.
@@ -258,15 +255,15 @@ def automatic_refresh():
 		session['oauth_object'] = token
 	
 	oauth = OAuth2Session(client_id,
-							token=session['oauth_object'],
+							token=token,
 							auto_refresh_kwargs=extra,
 							auto_refresh_url=refresh_url,
 							token_updater=token_updater)
-	sleep(0.5)
+	
 	# Trigger the automatic refresh
 	refresh = ""
 	try:
-		refresh = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + session['oauth_object']['refresh_token']}).json()
+		refresh = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + refresh_token}).json()
 		return jsonify(refresh)
 	except Exception as e:
 		print(e)
@@ -285,7 +282,6 @@ def manual_refresh():
 	}
 	
 	oauth = OAuth2Session(client_id, token=token)
-	sleep(0.5)
 	try:
 		session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
 		return jsonify(session['oauth_object'])
