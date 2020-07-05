@@ -79,6 +79,7 @@ def callback():
 def menu():
 	count = 1000
 	while not session['oauth_object'] and count:
+		print(count)
 		count -= 1
 	creds = session['oauth_object']
 	"""Main menu
@@ -108,6 +109,7 @@ def menu():
 def profile():
 	count = 1000
 	while not session['oauth_object'] and count:
+		print(count)
 		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
@@ -127,6 +129,7 @@ def profile():
 def devices():
 	count = 1000
 	while not session['oauth_object'] and count:
+		print(count)
 		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
@@ -146,6 +149,7 @@ def devices():
 def air_data():
 	count = 1000
 	while not session['oauth_object'] and count:
+		print(count)
 		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
@@ -188,10 +192,11 @@ def air_data():
 		return redirect('/air-data')
 
 
-@app.route("/air-data/download", methods=["GET", "POST"])
+@app.route("/air-data/download", methods=["POST"]) # "GET", 
 def air_data_download():
 	count = 1000
 	while not session['oauth_object'] and count:
+		print(count)
 		count -= 1
 	oauth_obj = session['oauth_object']
 	bearer_token = oauth_obj['access_token']
@@ -254,6 +259,7 @@ def air_data_download():
 def automatic_refresh():
 	count = 1000
 	while not session['oauth_object'] and count:
+		print(count)
 		count -= 1
 	oauth_obj = session['oauth_object']
 	refresh_token = oauth_obj['refresh_token']
@@ -292,6 +298,7 @@ def automatic_refresh():
 def manual_refresh():
 	count = 1000
 	while not session['oauth_object'] and count:
+		print(count)
 		count -= 1
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
