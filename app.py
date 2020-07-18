@@ -63,7 +63,7 @@ def callback():
 	try:
 		url = 'https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code
 		token_obj = requests.get(url)
-		print("/callback token_obj: " + token_obj)
+		print("/callback token_obj: " + token_obj.text)
 		# token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
 		# print(token_obj)
 		
