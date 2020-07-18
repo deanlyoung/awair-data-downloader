@@ -81,7 +81,7 @@ def menu():
 	while not session['oauth_object'] and count:
 		print(count)
 		count -= 1
-	creds = session['oauth_object']
+	creds = session.get("oauth_object", " ")
 	"""Main menu
 	"""
 	return """
@@ -111,7 +111,7 @@ def profile():
 	while not session['oauth_object'] and count:
 		print(count)
 		count -= 1
-	oauth_obj = session['oauth_object']
+	oauth_obj = session.get("oauth_object", " ")
 	bearer_token = oauth_obj['access_token']
 	"""Fetching profile data
 	"""
@@ -131,7 +131,7 @@ def devices():
 	while not session['oauth_object'] and count:
 		print(count)
 		count -= 1
-	oauth_obj = session['oauth_object']
+	oauth_obj = session.get("oauth_object", " ")
 	bearer_token = oauth_obj['access_token']
 	"""Fetching device list
 	"""
@@ -151,7 +151,7 @@ def air_data():
 	while not session['oauth_object'] and count:
 		print(count)
 		count -= 1
-	oauth_obj = session['oauth_object']
+	oauth_obj = session.get("oauth_object", " ")
 	bearer_token = oauth_obj['access_token']
 	"""Fetch device list
 	"""
@@ -198,7 +198,7 @@ def air_data_download():
 	while not session['oauth_object'] and count:
 		print(count)
 		count -= 1
-	oauth_obj = session['oauth_object']
+	oauth_obj = session.get("oauth_object", " ")
 	bearer_token = oauth_obj['access_token']
 	# used with GET method
 	# device_type = request.args.get('device_type')
@@ -262,7 +262,7 @@ def automatic_refresh():
 	while not session['oauth_object'] and count:
 		print(count)
 		count -= 1
-	oauth_obj = session['oauth_object']
+	oauth_obj = session.get("oauth_object", " ")
 	refresh_token = oauth_obj['refresh_token']
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
@@ -303,7 +303,7 @@ def manual_refresh():
 		count -= 1
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
-	token = session['oauth_object']
+	token = session.get("oauth_object", " ")
 	
 	extra = {
 		'client_id': client_id,
