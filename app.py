@@ -77,6 +77,10 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
+	count = 1000
+	while not session['oauth_object'] and count:
+		print(count)
+		count -= 1
 	creds = session.get("oauth_object", "oauth_object empty")
 	print('/menu type: ' + str(type(creds)) + ', creds: ' + str(creds))
 	"""Main menu
@@ -104,6 +108,10 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
+	count = 1000
+	while not session['oauth_object'] and count:
+		print(count)
+		count -= 1
 	oauth_obj = session.get("oauth_object", "oauth_object empty")
 	print('/profile type: ' + str(type(oauth_obj)) + ', oauth_obj: ' + str(oauth_obj))
 	bearer_token = oauth_obj.get("access_token", "access_token empty")
