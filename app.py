@@ -40,8 +40,8 @@ def demo():
 	"""
 	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 	authorization_url, state = oauth.authorization_url(authorization_base_url)
-	print('authorization_url: ' + authorization_url)
-	print('state: ' + state)
+	print('/ authorization_url: ' + authorization_url)
+	print('/ state: ' + state)
 	
 	# State is used to prevent CSRF, keep this for later.
 	session['state'] = state
@@ -52,7 +52,7 @@ def demo():
 @app.route("/callback", methods=["GET"])
 def callback():
 	code = request.args.get('code')
-	print('code: ' + code)
+	print('/callback code: ' + code)
 	""" Step 3: Retrieving an access token.
 	
 	The user has been redirected back from the provider to your registered
@@ -63,7 +63,7 @@ def callback():
 	try:
 		url = 'https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code
 		token_obj = requests.get(url)
-		print(token_obj.json())
+		print("/callback token_obj: " + token_obj.json())
 		# token_obj = oauth.fetch_token(token_url, client_secret=client_secret, code=code, authorization_response=request.url)
 		# print(token_obj)
 		
@@ -77,8 +77,8 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
-	creds = session.get("oauth_object", " ")
-	print(creds)
+	creds = session.get("oauth_object", "oauth_object empty")
+	print('/menu creds: ' + creds)
 	"""Main menu
 	"""
 	return """
@@ -104,9 +104,10 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
-	oauth_obj = session.get("oauth_object", " ")
-	print(oauth_obj)
-	bearer_token = oauth_obj.get("access_token", " ")
+	oauth_obj = session.get("oauth_object", "oauth_object empty")
+	print('/profile oauth_obj: ' + oauth_obj)
+	bearer_token = oauth_obj.get("access_token", "access_token empty")
+	print('/profile bearer_token: ' + bearer_token)
 	"""Fetching profile data
 	"""
 	prof = ""
@@ -120,8 +121,10 @@ def profile():
 
 @app.route("/devices", methods=["GET"])
 def devices():
-	oauth_obj = session.get("oauth_object", " ")
-	bearer_token = oauth_obj.get("access_token", " ")
+	oauth_obj = session.get("oauth_object", "oauth_object empty")
+	print('/devices oauth_obj: ' + oauth_obj)
+	bearer_token = oauth_obj.get("access_token", "access_token empty")
+	print('/devices bearer_token: ' + bearer_token)
 	"""Fetching device list
 	"""
 	devs = ""
@@ -135,8 +138,10 @@ def devices():
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
-	oauth_obj = session.get("oauth_object", " ")
-	bearer_token = oauth_obj.get("access_token", " ")
+	oauth_obj = session.get("oauth_object", "empty")
+	print('/air-data oauth_obj: ' + oauth_obj)
+	bearer_token = oauth_obj.get("access_token", "empty")
+	print('/air-data bearer_token: ' + bearer_token)
 	"""Fetch device list
 	"""
 	oauth = OAuth2Session(client_id, token=oauth_obj)
