@@ -52,7 +52,7 @@ def demo():
 @app.route("/callback", methods=["GET"])
 def callback():
 	code = request.args.get('code')
-	print('/callback code: ' + code)
+	print('/callback type: ' + type(code) + ', code: ' + str(code))
 	""" Step 3: Retrieving an access token.
 	
 	The user has been redirected back from the provider to your registered
@@ -78,7 +78,7 @@ def callback():
 @app.route("/menu", methods=["GET"])
 def menu():
 	creds = session.get("oauth_object", "oauth_object empty")
-	print('/menu creds: ' + creds)
+	print('/menu type: ' + type(creds) + ', creds: ' + str(creds))
 	"""Main menu
 	"""
 	return """
@@ -105,9 +105,9 @@ def menu():
 @app.route("/profile", methods=["GET"])
 def profile():
 	oauth_obj = session.get("oauth_object", "oauth_object empty")
-	print('/profile oauth_obj: ' + oauth_obj)
+	print('/profile type: ' + type(oauth_obj) + ', oauth_obj: ' + str(oauth_obj))
 	bearer_token = oauth_obj.get("access_token", "access_token empty")
-	print('/profile bearer_token: ' + bearer_token)
+	print('/profile type: ' + type(bearer_token) + ', bearer_token: ' + str(bearer_token))
 	"""Fetching profile data
 	"""
 	prof = ""
@@ -122,9 +122,9 @@ def profile():
 @app.route("/devices", methods=["GET"])
 def devices():
 	oauth_obj = session.get("oauth_object", "oauth_object empty")
-	print('/devices oauth_obj: ' + oauth_obj)
+	print('/devices type: ' + type(oauth_obj) + ', oauth_obj: ' + str(oauth_obj))
 	bearer_token = oauth_obj.get("access_token", "access_token empty")
-	print('/devices bearer_token: ' + bearer_token)
+	print('/devices type: ' + type(bearer_token) + ', bearer_token: ' + str(bearer_token))
 	"""Fetching device list
 	"""
 	devs = ""
@@ -138,10 +138,10 @@ def devices():
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
-	oauth_obj = session.get("oauth_object", "empty")
-	print('/air-data oauth_obj: ' + oauth_obj)
-	bearer_token = oauth_obj.get("access_token", "empty")
-	print('/air-data bearer_token: ' + bearer_token)
+	oauth_obj = session.get("oauth_object", "oauth_object empty")
+	print('/air-data type: ' + type(oauth_obj) + ', oauth_obj: ' + str(oauth_obj))
+	bearer_token = oauth_obj.get("access_token", "access_token empty")
+	print('/air-data type: ' + type(bearer_token) + ', bearer_token: ' + str(bearer_token))
 	"""Fetch device list
 	"""
 	oauth = OAuth2Session(client_id, token=oauth_obj)
@@ -183,8 +183,10 @@ def air_data():
 
 @app.route("/air-data/download", methods=["POST"]) # "GET", 
 def air_data_download():
-	oauth_obj = session.get("oauth_object", " ")
-	bearer_token = oauth_obj.get("access_token", " ")
+	oauth_obj = session.get("oauth_object", "oauth_object empty")
+	print('/air-data/download type: ' + type(oauth_obj) + ', oauth_obj: ' + str(oauth_obj))
+	bearer_token = oauth_obj.get("access_token", "access_token empty")
+	print('/air-data/download type: ' + type(bearer_token) + ', bearer_token: ' + str(bearer_token))
 	# used with GET method
 	# device_type = request.args.get('device_type')
 	# device_id = request.args.get('device_id')
@@ -243,7 +245,9 @@ def air_data_download():
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
 	oauth_obj = session.get("oauth_object", " ")
-	refresh_token = oauth_obj.get("refresh_token", " ")
+	print('/automatic-refresh type: ' + type(oauth_obj) + ', oauth_obj: ' + str(oauth_obj))
+	refresh_token = oauth_obj.get("refresh_token", "refresh_token empty")
+	print('/automatic-refresh type: ' + type(refresh_token) + ', refresh_token: ' + str(refresh_token))
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	# We force an expiration by setting expired at in the past.
@@ -279,7 +283,7 @@ def automatic_refresh():
 def manual_refresh():
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
-	token = session.get("oauth_object", " ")
+	token = session.get("oauth_object", "oauth_obj empty")
 	
 	extra = {
 		'client_id': client_id,
