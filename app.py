@@ -78,6 +78,7 @@ def callback():
 @app.route("/menu", methods=["GET"])
 def menu():
 	creds = session.get("oauth_object", " ")
+	print(creds)
 	"""Main menu
 	"""
 	return """
@@ -104,10 +105,10 @@ def menu():
 @app.route("/profile", methods=["GET"])
 def profile():
 	oauth_obj = session.get("oauth_object", " ")
-	bearer_token = oauth_obj['access_token']
+	print(oauth_obj)
+	bearer_token = oauth_obj.get("access_token", " ")
 	"""Fetching profile data
 	"""
-	oauth = OAuth2Session(client_id, token=oauth_obj)
 	prof = ""
 	try:
 		profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -120,10 +121,9 @@ def profile():
 @app.route("/devices", methods=["GET"])
 def devices():
 	oauth_obj = session.get("oauth_object", " ")
-	bearer_token = oauth_obj['access_token']
+	bearer_token = oauth_obj.get("access_token", " ")
 	"""Fetching device list
 	"""
-	oauth = OAuth2Session(client_id, token=oauth_obj)
 	devs = ""
 	try:
 		devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -136,7 +136,7 @@ def devices():
 @app.route("/air-data", methods=["GET"])
 def air_data():
 	oauth_obj = session.get("oauth_object", " ")
-	bearer_token = oauth_obj['access_token']
+	bearer_token = oauth_obj.get("access_token", " ")
 	"""Fetch device list
 	"""
 	oauth = OAuth2Session(client_id, token=oauth_obj)
@@ -179,7 +179,7 @@ def air_data():
 @app.route("/air-data/download", methods=["POST"]) # "GET", 
 def air_data_download():
 	oauth_obj = session.get("oauth_object", " ")
-	bearer_token = oauth_obj['access_token']
+	bearer_token = oauth_obj.get("access_token", " ")
 	# used with GET method
 	# device_type = request.args.get('device_type')
 	# device_id = request.args.get('device_id')
@@ -197,7 +197,6 @@ def air_data_download():
 	add_day = temp_date + timedelta(days=1)
 	to_date = datetime.strftime(add_day, "%Y-%m-%d")
 	fahrenheit = request.form['temp_unit']
-	oauth = OAuth2Session(client_id, token=oauth_obj)
 	air_data_url = 'https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit)
 	try:
 		air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -239,7 +238,7 @@ def air_data_download():
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
 	oauth_obj = session.get("oauth_object", " ")
-	refresh_token = oauth_obj['refresh_token']
+	refresh_token = oauth_obj.get("refresh_token", " ")
 	"""Refreshing an OAuth 2 token using a refresh token.
 	"""
 	# We force an expiration by setting expired at in the past.
