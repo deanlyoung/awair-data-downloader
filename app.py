@@ -78,9 +78,9 @@ def callback():
 @app.route("/menu", methods=["GET"])
 def menu():
 	count = 1000
-		while not session['oauth_object'] and count:
-			print(count)
-			count -= 1
+	while not session['oauth_object'] and count:
+		print(count)
+		count -= 1
 	creds = session['oauth_object']
 	"""Main menu
 	"""
