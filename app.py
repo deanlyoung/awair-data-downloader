@@ -197,7 +197,7 @@ def air_data():
 		return redirect('/air-data')
 
 
-@app.route("/air-data/download", methods=["POST"]) # "GET", 
+@app.route("/air-data/download", methods=["POST","GET"])
 def air_data_download():
 	count = 1000
 	while not session and count:
