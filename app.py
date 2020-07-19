@@ -217,24 +217,24 @@ def air_data_download():
 			# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
 			# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
 			samples_array = []
+			for sample in samples:
+				row = [None] * 7
+				row[0] = sample['timestamp']
+				row[1] = int(sample['score'])
+				sensors = sample['sensors']
+				for sensor in sensors:
+					if sensor['comp'] == "temp":
+						row[2] = float(sensor['value'])
+					elif sensor['comp'] == "humid":
+						row[3] = float(sensor['value'])
+					elif sensor['comp'] == "co2":
+						row[4] = float(sensor['value'])
+					elif sensor['comp'] == "voc":
+						row[5] = float(sensor['value'])
+					elif sensor['comp'] == "pm25":
+						row[6] = float(sensor['value'])
+				samples_array.append(row)
 			with open('air-data.csv', mode='w', newline='') as samples_file:
-				for sample in samples:
-					row = [None] * 7
-					row[0] = sample['timestamp']
-					row[1] = int(sample['score'])
-					sensors = sample['sensors']
-					for sensor in sensors:
-						if sensor['comp'] == "temp":
-							row[2] = float(sensor['value'])
-						elif sensor['comp'] == "humid":
-							row[3] = float(sensor['value'])
-						elif sensor['comp'] == "co2":
-							row[4] = float(sensor['value'])
-						elif sensor['comp'] == "voc":
-							row[5] = float(sensor['value'])
-						elif sensor['comp'] == "pm25":
-							row[6] = float(sensor['value'])
-					samples_array.append(row)
 				samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 				samples_writer.writerow(samples_array)
 			return jsonify(samples_array)
