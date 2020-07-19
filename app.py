@@ -21,6 +21,8 @@ app.secret_key = os.environ.get('APP_SECRET_KEY', None)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
+# Keep these safe and do not share anywhere
+# except in your config variables or somewhere else secure
 client_id = os.environ.get('CLIENT_ID', None)
 client_secret = os.environ.get('CLIENT_SECRET', None)
 redirect_uri = "https://awair-data-downloader.herokuapp.com/callback"
@@ -91,7 +93,6 @@ def menu():
 		</ul>
 		<br><br>
 		<ul>
-			<li><a href="/automatic-refresh"> Implicitly refresh the token</a></li>
 			<li><a href="/manual-refresh"> Explicitly refresh the token</a></li>
 			<li><a href="/"> Re-Authenticate</a></li>
 		</ul>
@@ -171,7 +172,8 @@ def air_data():
 			"""Select Device
 			"""
 			return """
-			<h2>Choose a device and time range:</h2>
+			<h2>Device, Date, and Temperature Units:</h2>
+			<p>Only one device and one day per download.</p>
 			<form id="air_data_download_form" action="/air-data/download" method="post" enctype="multipart/form-data">
 		    	<label for="device_uuid">Select Device:<br>
 					<select id="device_uuid" name="device_uuid" required>
@@ -179,15 +181,15 @@ def air_data():
 					</select>
 				</label>
 				<br><br>
-				<label for="device">Choose Date (UTC):<br>
+				<label for="device">Enter Date (UTC / YYYY-MM-DD):<br>
 					<input type="date" id="date" name="date" pattern="{regex}" value="{yesterday}" max="{yesterday}" step="1" required>
 				</label>
 				<br><br>
-				<span>Temperature Unit:</span><br>
+				<span>Choose Temperature Unit:</span><br>
 				<input type="radio" id="temp_f" name="temp_unit" value="true">
-				<label for="temp_f">Fahrenheit</label><br>
+				<label for="temp_f">Fahrenheit (&deg;F)</label><br>
 				<input type="radio" id="temp_c" name="temp_unit" value="false">
-				<label for="temp_c" selected>Celsius</label>
+				<label for="temp_c" checked>Celsius (&deg;C)</label>
 				<br><br>
 		    	<input type="submit" value="Download">
 			</form>
@@ -205,13 +207,6 @@ def air_data_download():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/air-data/download oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		# used with GET method
-		# device_type = request.args.get('device_type')
-		# device_id = request.args.get('device_id')
-		# from_date = request.args.get('from_date')
-		# to_date = request.args.get('to_date')
-		# fahrenheit = request.args.get('fahrenheit')
-		# used with POST method
 		"""Fetching air-data
 		"""
 		device_uuid = request.form['device_uuid']
@@ -230,21 +225,22 @@ def air_data_download():
 			header = ['timestamp','score','temp','humid','co2','voc','pm25']
 			samples_array.append(header)
 			for sample in samples:
-				row = [None] * 7
+				row = [None] * 8
 				row[0] = sample['timestamp']
-				row[1] = "{:.0f}".format(float(sample['score']))
+				row[1] = str(device_uuid)
+				row[2] = "{:.0f}".format(float(sample['score']))
 				sensors = sample['sensors']
 				for sensor in sensors:
 					if sensor['comp'] == "temp":
-						row[2] = "{:.2f}".format(float(sensor['value']))
-					elif sensor['comp'] == "humid":
 						row[3] = "{:.2f}".format(float(sensor['value']))
+					elif sensor['comp'] == "humid":
+						row[4] = "{:.2f}".format(float(sensor['value']))
 					elif sensor['comp'] == "co2":
-						row[4] = "{:.0f}".format(float(sensor['value']))
-					elif sensor['comp'] == "voc":
 						row[5] = "{:.0f}".format(float(sensor['value']))
-					elif sensor['comp'] == "pm25":
+					elif sensor['comp'] == "voc":
 						row[6] = "{:.0f}".format(float(sensor['value']))
+					elif sensor['comp'] == "pm25":
+						row[7] = "{:.0f}".format(float(sensor['value']))
 				samples_array.append(row)
 			file_name = device_uuid + '-' + from_date + '.csv'
 			with open(file_name, mode='w', newline='') as samples_file:
@@ -254,45 +250,6 @@ def air_data_download():
 		except Exception as e:
 			print(e)
 			return "error :("
-	else:
-		print('redirecting to root to force login')
-		return redirect('/')
-
-
-@app.route("/automatic-refresh", methods=["GET"])
-def automatic_refresh():
-	if 'oauth_object' in session:
-		oauth_obj = session.get("oauth_object", "/automatic-refresh oauth_object empty")
-		refresh_token = oauth_obj['access_token']
-		"""Refreshing an OAuth 2 token using a refresh token.
-		"""
-		# We force an expiration by setting expired at in the past.
-		# This will trigger an automatic refresh next time we interact with
-		# Awair's API.
-		#token['expires_at'] = time() - 10
-		
-		extra = {
-			'client_id': client_id,
-			'client_secret': client_secret
-		}
-		
-		def token_updater(token):
-			session['oauth_object'] = token
-		
-		oauth = OAuth2Session(client_id,
-								token=token,
-								auto_refresh_kwargs=extra,
-								auto_refresh_url=refresh_url,
-								token_updater=token_updater)
-		
-		# Trigger the automatic refresh
-		refresh = ""
-		try:
-			refresh = oauth.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + refresh_token}).json()
-			return jsonify(refresh)
-		except Exception as e:
-			print(e)
-			return redirect('/automatic-refresh')
 	else:
 		print('redirecting to root to force login')
 		return redirect('/')

@@ -1,0 +1,23 @@
+{
+	"name": "Awair CSV Download Example",
+	"description": "A barebones CSV exporter for Awair data using Heroku and Flask",
+	"repository": "https://github.com/deanlyoung/awair-data-downloader",
+	"logo": "https://raw.githubusercontent.com/deanlyoung/awair-data-downloader/master/favicon.ico",
+	"keywords": ["heroku", "flask", "python", "csv", "download", "awair"],
+	"env": {
+		"APP_SECRET_KEY": {
+			"description": "A unique, randomly generated secret key to create a secure session cookie for your app.",
+			"generator": "secret",
+			"required": true
+		},
+		"CLIENT_ID": {
+			"description": "The Client ID can be found in the Awair Developer Console under your app details.",
+			"required": true
+		},
+		"CLIENT_SECRET": {
+			"description": "The Client Secret can be found in the Awair Developer Console under your app details.",
+			"required": true
+			
+		}
+	}
+}
