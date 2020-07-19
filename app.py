@@ -235,7 +235,7 @@ def air_data_download():
 							row[6] = float(sensor['value'])
 					samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 					samples_writer.writerow(row)
-			# return air-data.csv
+			return "success :)"
 		except Exception as e:
 			print(e)
 			return "error :("
