@@ -214,8 +214,6 @@ def air_data_download():
 		try:
 			air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			samples = air_data['data']
-			# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
-			# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
 			samples_array = []
 			header = ['timestamp','score','temp','humid','co2','voc','pm25']
 			samples_array.append(header)
@@ -236,11 +234,11 @@ def air_data_download():
 					elif sensor['comp'] == "pm25":
 						row[6] = "{:.0f}".format(float(sensor['value']))
 				samples_array.append(row)
-			with open('air-data.csv', mode='w', newline='') as samples_file:
+			file_name = device_uuid + '-' + from_date + '.csv'
+			with open(file_name, mode='w', newline='') as samples_file:
 				samples_writer = csv.writer(samples_file, delimiter=',', quoting=csv.QUOTE_ALL)
 				samples_writer.writerows(samples_array)
-				# samples_file.close()
-			return send_file('air-data.csv')
+			return send_file(file_name, mimetype="text/csv", as_attachment=True)
 		except Exception as e:
 			print(e)
 			return "error :("
