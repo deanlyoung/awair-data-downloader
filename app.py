@@ -59,7 +59,7 @@ def callback():
 	callback URL. With this redirection comes an authorization code included
 	in the redirect URL. We will use that to obtain an access token.
 	"""
-	oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
+	# oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.url)
 	try:
 		url = 'https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code
 		token_obj = requests.get(url)
@@ -108,6 +108,7 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
+	print('/profile type: ' + str(type(session)) + ', session: ' + str(session))
 	count = 10
 	while not session and count:
 		print(count)
