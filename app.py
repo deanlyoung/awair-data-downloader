@@ -1,8 +1,10 @@
 import os
 from pprint import pformat
 from time import time, sleep
-import datetime
-from datetime import datetime, timedelta
+from datetime import date
+from datetime import time
+from datetime import datetime
+from datetime import timedelta
 import json
 import csv
 from flask import Flask, request, redirect, session, url_for
@@ -11,7 +13,7 @@ import requests
 from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
-app.permanent_session_lifetime = datetime.timedelta(days=1)
+app.permanent_session_lifetime = timedelta(days=1)
 app.secret_key = os.urandom(24)
 
 # This information is obtained upon registration of a new Awair OAuth
