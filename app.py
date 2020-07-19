@@ -212,33 +212,34 @@ def air_data_download():
 		fahrenheit = request.form['temp_unit']
 		air_data_url = 'https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit)
 		try:
+			samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+			air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
+			samples = air_data['data']
+			# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
+			# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
+			samples_array = []
+			header = ['timestamp','score','temp','humid','co2','voc','pm25']
+			samples_array.append(header)
+			for sample in samples:
+				row = [None] * 7
+				row[0] = sample['timestamp']
+				row[1] = "{:.0f}".format(float(sample['score']))
+				sensors = sample['sensors']
+				for sensor in sensors:
+					if sensor['comp'] == "temp":
+						row[2] = "{:.2f}".format(float(sensor['value']))
+					elif sensor['comp'] == "humid":
+						row[3] = "{:.2f}".format(float(sensor['value']))
+					elif sensor['comp'] == "co2":
+						row[4] = "{:.0f}".format(float(sensor['value']))
+					elif sensor['comp'] == "voc":
+						row[5] = "{:.0f}".format(float(sensor['value']))
+					elif sensor['comp'] == "pm25":
+						row[6] = "{:.0f}".format(float(sensor['value']))
+				samples_array.append(row)
 			with open('air-data.csv', mode='w', newline='') as samples_file:
-				samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-				air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
-				samples = air_data['data']
-				# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
-				# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
-				samples_array = []
-				header = ['timestamp','score','temp','humid','co2','voc','pm25']
-				samples_array.append(header)
-				for sample in samples:
-					row = [None] * 7
-					row[0] = sample['timestamp']
-					row[1] = "{:.0f}".format(float(sample['score']))
-					sensors = sample['sensors']
-					for sensor in sensors:
-						if sensor['comp'] == "temp":
-							row[2] = "{:.2f}".format(float(sensor['value']))
-						elif sensor['comp'] == "humid":
-							row[3] = "{:.2f}".format(float(sensor['value']))
-						elif sensor['comp'] == "co2":
-							row[4] = "{:.0f}".format(float(sensor['value']))
-						elif sensor['comp'] == "voc":
-							row[5] = "{:.0f}".format(float(sensor['value']))
-						elif sensor['comp'] == "pm25":
-							row[6] = "{:.0f}".format(float(sensor['value']))
-					samples_array.append(row)
-				samples_writer.writerow(row)
+				samples_writer = csv.writer(samples_file)
+				samples_writer.writerows(samples_array)
 				samples_file.close()
 			return jsonify(samples_array)
 		except Exception as e:
