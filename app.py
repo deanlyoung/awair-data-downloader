@@ -14,7 +14,7 @@ from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
 app.permanent_session_lifetime = timedelta(days=1)
-app.secret_key = os.urandom(24)
+app.secret_key = os.urandom(16)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
