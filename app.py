@@ -222,19 +222,19 @@ def air_data_download():
 			for sample in samples:
 				row = [None] * 7
 				row[0] = sample['timestamp']
-				row[1] = int(sample['score'])
+				row[1] = "{:.0f}".format(float(sample['score']))
 				sensors = sample['sensors']
 				for sensor in sensors:
 					if sensor['comp'] == "temp":
-						row[2] = float(sensor['value'])
+						row[2] = "{:.2f}".format(float(sensor['value']))
 					elif sensor['comp'] == "humid":
-						row[3] = float(sensor['value'])
+						row[3] = "{:.2f}".format(float(sensor['value']))
 					elif sensor['comp'] == "co2":
-						row[4] = float(sensor['value'])
+						row[4] = "{:.0f}".format(float(sensor['value']))
 					elif sensor['comp'] == "voc":
-						row[5] = float(sensor['value'])
+						row[5] = "{:.0f}".format(float(sensor['value']))
 					elif sensor['comp'] == "pm25":
-						row[6] = float(sensor['value'])
+						row[6] = "{:.0f}".format(float(sensor['value']))
 				samples_array.append(row)
 			with open('air-data.csv', mode='w', newline='') as samples_file:
 				samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
