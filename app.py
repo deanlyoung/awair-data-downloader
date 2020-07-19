@@ -216,36 +216,29 @@ def air_data_download():
 			samples = air_data['data']
 			# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
 			# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
-			samples_array = []
-			for sample in samples:
-				row = [None] * 9
-				row[0] = sample['timestamp']
-				row[1] = int(sample['score'])
-				sensors = sample['sensors']
-				for sensor in sensors:
-					if sensor['comp'] == "temp":
-						row[2] = float(sensor['value'])
-					elif sensor['comp'] == "humid":
-						row[3] = float(sensor['value'])
-					elif sensor['comp'] == "co2":
-						row[4] = float(sensor['value'])
-					elif sensor['comp'] == "voc":
-						row[5] = float(sensor['value'])
-					elif sensor['comp'] == "pm25":
-						row[6] = float(sensor['value'])
-					elif sensor['comp'] == "lux":
-						row[7] = float(sensor['value'])
-					elif sensor['comp'] == "spl_a":
-						row[8] = float(sensor['value'])
-					else:
-						print("unknown sensor: " + str(sensor['comp']))
-				samples_array.append(row)
-			samples_array = json.loads(samples_array)
-			print(str(samples_array))
-			return jsonify(samples_array)
+			with open('air-data.csv', mode='w') as samples_file:
+				for sample in samples:
+					row = [None] * 7
+					row[0] = sample['timestamp']
+					row[1] = int(sample['score'])
+					sensors = sample['sensors']
+					for sensor in sensors:
+						if sensor['comp'] == "temp":
+							row[2] = float(sensor['value'])
+						elif sensor['comp'] == "humid":
+							row[3] = float(sensor['value'])
+						elif sensor['comp'] == "co2":
+							row[4] = float(sensor['value'])
+						elif sensor['comp'] == "voc":
+							row[5] = float(sensor['value'])
+						elif sensor['comp'] == "pm25":
+							row[6] = float(sensor['value'])
+					samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+					samples_writer.writerow(row)
+			# return air-data.csv
 		except Exception as e:
 			print(e)
-			# return redirect('/air-data/download')
+			return "error :("
 	else:
 		print('redirecting to root to force login')
 		return redirect('/')
