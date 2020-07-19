@@ -150,7 +150,6 @@ def air_data():
 		bearer_token = oauth_obj['access_token']
 		"""Fetch device list
 		"""
-		# oauth = OAuth2Session(client_id, token=oauth_obj)
 		select_opts = ""
 		try:
 			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -159,10 +158,9 @@ def air_data():
 				select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
 			"""Select Device
 			"""
-			print(select_opts)
 			return """
 			<h2>Choose a device and time range:</h2>
-			<form action="/air-data/download" method="post">
+			<form id="air_data_download_form" action="/air-data/download" method="post" enctype="multipart/form-data">
 		    	<label for="device_uuid">Select Device:<br>
 					<select id="device_uuid" name="device_uuid" required>
 						%s 
@@ -170,7 +168,7 @@ def air_data():
 				</label>
 				<br><br>
 				<label for="device">Choose Date (UTC):<br>
-					<input type="date" name="date" required pattern="\d{4}-\d{2}-\d{2}">
+					<input type="date" id="date" name="date" required pattern="\d{4}-\d{2}-\d{2}">
 				</label>
 				<br><br>
 				<span>Temperature Unit:</span><br>
@@ -240,14 +238,14 @@ def air_data_download():
 					elif sensor['comp'] == "spl_a":
 						row[8] = float(sensor['value'])
 					else:
-						print("unknown sensor: " + sensor['comp'])
+						print("unknown sensor: " + str(sensor['comp']))
 				samples_array.append(row)
 			samples_array = json.loads(samples_array)
-			
+			print(str(samples_array))
 			return jsonify(samples_array)
 		except Exception as e:
 			print(e)
-			return redirect('/air-data/download')
+			# return redirect('/air-data/download')
 	else:
 		print('redirecting to root to force login')
 		return redirect('/')
