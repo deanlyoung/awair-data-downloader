@@ -77,7 +77,7 @@ def callback():
 
 @app.route("/menu", methods=["GET"])
 def menu():
-	count = 1000
+	count = 10
 	while not session and count:
 		print(count)
 		count -= 1
@@ -108,7 +108,7 @@ def menu():
 
 @app.route("/profile", methods=["GET"])
 def profile():
-	count = 1000
+	count = 10
 	while not session and count:
 		print(count)
 		count -= 1
@@ -129,7 +129,7 @@ def profile():
 
 @app.route("/devices", methods=["GET"])
 def devices():
-	count = 1000
+	count = 10
 	while not session and count:
 		print(count)
 		count -= 1
@@ -150,7 +150,7 @@ def devices():
 
 @app.route("/air-data", methods=["GET"])
 def air_data():
-	count = 1000
+	count = 10
 	while not session and count:
 		print(count)
 		count -= 1
@@ -199,7 +199,7 @@ def air_data():
 
 @app.route("/air-data/download", methods=["POST","GET"])
 def air_data_download():
-	count = 1000
+	count = 10
 	while not session and count:
 		print(count)
 		count -= 1
@@ -264,7 +264,7 @@ def air_data_download():
 
 @app.route("/automatic-refresh", methods=["GET"])
 def automatic_refresh():
-	count = 1000
+	count = 10
 	while not session and count:
 		print(count)
 		count -= 1
