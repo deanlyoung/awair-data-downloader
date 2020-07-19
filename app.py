@@ -212,7 +212,6 @@ def air_data_download():
 		fahrenheit = request.form['temp_unit']
 		air_data_url = 'https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/5-min-avg?from=' + str(from_date) + 'T00:00:00.000Z&to=' + str(to_date) + 'T00:00:00.000Z&limit=288&desc=false&fahrenheit=' + str(fahrenheit)
 		try:
-			samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 			air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			samples = air_data['data']
 			# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
@@ -238,7 +237,7 @@ def air_data_download():
 						row[6] = "{:.0f}".format(float(sensor['value']))
 				samples_array.append(row)
 			with open('air-data.csv', mode='w', newline='') as samples_file:
-				samples_writer = csv.writer(samples_file)
+				samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 				samples_writer.writerows(samples_array)
 				samples_file.close()
 			return jsonify(samples_array)
