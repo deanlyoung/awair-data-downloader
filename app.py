@@ -175,12 +175,12 @@ def air_data():
 			<form id="air_data_download_form" action="/air-data/download" method="post" enctype="multipart/form-data">
 		    	<label for="device_uuid">Select Device:<br>
 					<select id="device_uuid" name="device_uuid" required>
-						{0}
+						{{0}}
 					</select>
 				</label>
 				<br><br>
 				<label for="device">Choose Date (UTC):<br>
-					<input type="date" id="date" name="date" pattern="\d\{4\}-\d\{2\}-\d\{2\}" value="{1}" max="{2}" step="1" required>
+					<input type="date" id="date" name="date" pattern="\d{4}-\d{2}-\d{2}" value="{{1}}" max="{{2}}" step="1" required>
 				</label>
 				<br><br>
 				<span>Temperature Unit:</span><br>
