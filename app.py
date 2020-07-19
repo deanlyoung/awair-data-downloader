@@ -236,8 +236,10 @@ def air_data_download():
 					elif sensor['comp'] == "pm25":
 						row[6] = "{:.0f}".format(float(sensor['value']))
 				samples_array.append(row)
-			with open('air-data.csv', mode='w', newline='') as samples_file:
-				samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+			csv.register_dialect('awairDialect', delimiter=',', quoting=csv.QUOTE_ALL)
+			samples_file = open('air-data.csv', mode='w', newline='')
+			with samples_file:
+				samples_writer = csv.writer(samples_file, dialect='awairDialect')
 				samples_writer.writerows(samples_array)
 				samples_file.close()
 			return jsonify(samples_array)
