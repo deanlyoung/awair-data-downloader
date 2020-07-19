@@ -217,6 +217,8 @@ def air_data_download():
 			# timestamp,score,sensors(temp,humid,co2,voc,pm25,lux,spl_a)
 			# dtype = [('timestamp', np.datetime64[s]), ('score', np.int32), ('temp', np.float64), ('humid', np.float64), ('co2', np.float64), ('voc', np.float64), ('pm25', np.float64), ('lux', np.float64), ('spl_a', np.float64)]
 			samples_array = []
+			header = ['timestamp','score','temp','humid','co2','voc','pm25']
+			samples_array.append(header)
 			for sample in samples:
 				row = [None] * 7
 				row[0] = sample['timestamp']
@@ -236,7 +238,7 @@ def air_data_download():
 				samples_array.append(row)
 			with open('air-data.csv', mode='w', newline='') as samples_file:
 				samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-				samples_writer.writerow(samples_array)
+				samples_writer.writerows(samples_array)
 			return jsonify(samples_array)
 		except Exception as e:
 			print(e)
