@@ -245,7 +245,7 @@ def air_data_download():
 			with samples_file:
 				samples_writer = csv.writer(samples_file, dialect='awairDialect')
 				samples_writer.writerows(samples_array)
-				samples_file.close()
+				# samples_file.close()
 				return send_file(samples_file, mimetype='text/csv')
 		except OSError:
 			abort(404)
