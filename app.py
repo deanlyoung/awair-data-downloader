@@ -239,6 +239,8 @@ def air_data_download():
 			with open('air-data.csv', mode='w', newline='') as samples_file:
 				samples_writer = csv.writer(samples_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 				samples_writer.writerows(samples_array)
+				samples_file.flush()
+			samples_file.close()
 			return jsonify(samples_array)
 		except Exception as e:
 			print(e)
