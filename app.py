@@ -188,8 +188,8 @@ def air_data():
 				<span>Choose Temperature Unit:</span><br>
 				<input type="radio" id="temp_f" name="temp_unit" value="true">
 				<label for="temp_f">Fahrenheit (&deg;F)</label><br>
-				<input type="radio" id="temp_c" name="temp_unit" value="false">
-				<label for="temp_c" checked>Celsius (&deg;C)</label>
+				<input type="radio" id="temp_c" name="temp_unit" value="false" checked>
+				<label for="temp_c">Celsius (&deg;C)</label>
 				<br><br>
 		    	<input type="submit" value="Download">
 			</form>
