@@ -165,8 +165,8 @@ def air_data():
 					select_opts += '<option value="' + str(device['deviceUUID']) + '" selected>' + str(device_name) + '</option>'
 				else:
 					select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device_name) + '</option>'
-			today_date = datetime.strptime(date.today(), "%Y-%m-%d")
-			subtract_day = temp_date + timedelta(days=-1)
+			today_date = datetime.strptime(str(date.today()), "%Y-%m-%d")
+			subtract_day = today_date + timedelta(days=-1)
 			yesterday_date = datetime.strftime(subtract_day, "%Y-%m-%d")
 			"""Select Device
 			"""
