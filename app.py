@@ -242,7 +242,7 @@ def air_data_download():
 				samples_writer = csv.writer(samples_file, dialect='awairDialect')
 				samples_writer.writerows(samples_array)
 				samples_file.close()
-			return jsonify(samples_array)
+			return samples_file
 		except Exception as e:
 			print(e)
 			return "error :("
