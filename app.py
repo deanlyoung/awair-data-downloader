@@ -180,7 +180,7 @@ def air_data():
 				</label>
 				<br><br>
 				<label for="device">Choose Date (UTC):<br>
-					<input type="date" id="date" name="date" pattern="\d{4}-\d{2}-\d{2}" value="{{yesterday}}" max="{{yesterday}}" step="1" required>
+					<input type="date" id="date" name="date" pattern="{{regex}}" value="{{yesterday}}" max="{{yesterday}}" step="1" required>
 				</label>
 				<br><br>
 				<span>Temperature Unit:</span><br>
@@ -191,7 +191,7 @@ def air_data():
 				<br><br>
 		    	<input type="submit" value="Download">
 			</form>
-			""".format(opts = str(select_opts), yesterday = str(yesterday_date))
+			""".format(opts = str(select_opts), yesterday = str(yesterday_date), regex = "\d{4}-\d{2}-\d{2}")
 		except Exception as e:
 			print(e)
 			return redirect('/air-data')
