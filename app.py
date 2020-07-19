@@ -240,7 +240,7 @@ def air_data_download():
 				samples_writer = csv.writer(samples_file, delimiter=',', quoting=csv.QUOTE_ALL)
 				samples_writer.writerows(samples_array)
 				# samples_file.close()
-				return send_file(samples_file)
+			return send_file('air-data.csv')
 		except Exception as e:
 			print(e)
 			return "error :("
