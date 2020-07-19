@@ -154,8 +154,20 @@ def air_data():
 		try:
 			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			devices_dict = devices['devices']
+			count = 0
 			for device in devices_dict:
-				select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device['name']) + '</option>'
+				count += 1
+				if device['name'] == "":
+					device_name = device['deviceUUID']
+				else:
+					device_name = device['name']
+				if count == 1:
+					select_opts += '<option value="' + str(device['deviceUUID']) + '" selected>' + str(device_name) + '</option>'
+				else:
+					select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device_name) + '</option>'
+			today_date = datetime.strptime(date.today(), "%Y-%m-%d")
+			subtract_day = temp_date + timedelta(days=-1)
+			yesterday_date = datetime.strftime(subtract_day, "%Y-%m-%d")
 			"""Select Device
 			"""
 			return """
@@ -163,23 +175,23 @@ def air_data():
 			<form id="air_data_download_form" action="/air-data/download" method="post" enctype="multipart/form-data">
 		    	<label for="device_uuid">Select Device:<br>
 					<select id="device_uuid" name="device_uuid" required>
-						%s 
+						{0}
 					</select>
 				</label>
 				<br><br>
 				<label for="device">Choose Date (UTC):<br>
-					<input type="date" id="date" name="date" required pattern="\d{4}-\d{2}-\d{2}">
+					<input type="date" id="date" name="date" pattern="\d\{4\}-\d\{2\}-\d\{2\}" value="{1}" max="{2}" step="1" required>
 				</label>
 				<br><br>
 				<span>Temperature Unit:</span><br>
 				<input type="radio" id="temp_f" name="temp_unit" value="true">
 				<label for="temp_f">Fahrenheit</label><br>
 				<input type="radio" id="temp_c" name="temp_unit" value="false">
-				<label for="temp_c">Celsius</label>
+				<label for="temp_c" selected>Celsius</label>
 				<br><br>
 		    	<input type="submit" value="Download">
 			</form>
-			""" % str(select_opts)
+			""".format(str(select_opts), str(yesterday_date), str(yesterday_date))
 		except Exception as e:
 			print(e)
 			return redirect('/air-data')
