@@ -1,4 +1,5 @@
 import os
+import pprint
 from pprint import pformat
 from time import time, sleep
 from datetime import date
@@ -14,6 +15,9 @@ from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
 app.permanent_session_lifetime = timedelta(days=1)
+
+env_var = os.environ
+pprint.pprint(dict(env_var), width = 1)
 
 # Keep this secret_key safe and do not share anywhere
 # except in your config variables or somewhere else secure
