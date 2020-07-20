@@ -16,14 +16,12 @@ from requests_oauthlib import OAuth2Session
 app = Flask(__name__)
 app.permanent_session_lifetime = timedelta(days=1)
 
-env_var = os.environ
-pprint.pprint(dict(env_var), width = 1)
+env_name = ENV["HEROKU_APP_NAME"]
+print(str(env_name))
 
 # Keep this secret_key safe and do not share anywhere
 # except in your config variables or somewhere else secure
 app.secret_key = os.environ.get('APP_SECRET_KEY', None)
-domain = str(os.environ.get('TEXTDOMAIN', None))
-print('domain: ' + domain)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
@@ -31,7 +29,7 @@ print('domain: ' + domain)
 # except in your config variables or somewhere else secure
 client_id = os.environ.get('CLIENT_ID', None)
 client_secret = os.environ.get('CLIENT_SECRET', None)
-redirect_uri = "https://" + domain + ".herokuapp.com/callback"
+redirect_uri = "https://" + env_name + ".herokuapp.com/callback"
 
 # Uncomment for detailed oauthlib logs
 import logging
@@ -277,7 +275,7 @@ def manual_refresh():
 		try:
 			token = jsonify(session['oauth_object'])
 			session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
-			redirect_url = 'https://' + domain + '.herokuapp.com/menu'
+			redirect_url = 'https://' + env_name + '.herokuapp.com/menu'
 			redirect = "{window.location='" + redirect_url + "'}"
 			return """
 			<html><body>
