@@ -5,10 +5,8 @@
 	"logo": "https://raw.githubusercontent.com/deanlyoung/awair-data-downloader/master/favicon.ico",
 	"keywords": ["heroku", "flask", "python", "csv", "download", "awair"],
 	"env": {
-		"HEROKU_APP_NAME": {
-			"required": true
-		},
-		"HEROKU_PARENT_APP_NAME": {
+		"APP_NAME": {
+			"description": "This should be the same as the 'App name' above. It is the subdomain in the app URL (*.heroku.com) where * is the APP_NAME",
 			"required": true
 		},
 		"APP_SECRET_KEY": {
