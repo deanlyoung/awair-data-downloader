@@ -270,7 +270,6 @@ def manual_refresh():
 		
 		oauth = OAuth2Session(client_id, token=token)
 		try:
-			token = jsonify(session['oauth_object'])
 			session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
 			redirect_url = 'https://' + subdomain + '.herokuapp.com/menu'
 			redirect = "{window.location='" + redirect_url + "'}"
@@ -279,7 +278,7 @@ def manual_refresh():
 			<p>You will be redirected in 3 seconds</p><p>{token}</p>
 			<script>var timer = setTimeout(function() {redirect}, 3000);</script>
 			</body></html>
-			"""
+			""".format(token = jsonify(session['oauth_object']), redirect = str(redirect))
 		except Exception as e:
 			print(e)
 			return redirect('/manual-refresh')
