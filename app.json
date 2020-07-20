@@ -5,6 +5,12 @@
 	"logo": "https://raw.githubusercontent.com/deanlyoung/awair-data-downloader/master/favicon.ico",
 	"keywords": ["heroku", "flask", "python", "csv", "download", "awair"],
 	"env": {
+		"HEROKU_APP_NAME": {
+			"required": true
+		},
+		"HEROKU_PARENT_APP_NAME": {
+			"required": true
+		},
 		"APP_SECRET_KEY": {
 			"description": "A unique, randomly generated secret key to create a secure session cookie for your app.",
 			"generator": "secret",
