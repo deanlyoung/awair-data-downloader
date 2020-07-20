@@ -94,7 +94,7 @@ def menu():
 		</ul>
 		<br><br>
 		<ul>
-			<li><a href="/manual-refresh"> Explicitly refresh the token</a></li>
+			<li><a href="/manual-refresh"> Manually refresh the token</a></li>
 			<li><a href="/"> Re-Authenticate</a></li>
 		</ul>
 		
@@ -276,9 +276,9 @@ def manual_refresh():
 			redirect = "{window.location='" + redirect_url + "'}"
 			return """
 			<html><body>
-			<p>You will be redirected in 3 seconds</p>
+			<p>You will be redirected in 5 seconds</p>
 			<p>{token}</p>
-			<script>var timer = setTimeout(function() {redirect}, 3000);</script>
+			<script>var timer = setTimeout(function() {redirect}, 5000);</script>
 			</body></html>
 			""".format(token = str(token), redirect = str(redirect))
 		except Exception as e:
