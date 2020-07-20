@@ -18,7 +18,7 @@ app.permanent_session_lifetime = timedelta(days=1)
 # Keep this secret_key safe and do not share anywhere
 # except in your config variables or somewhere else secure
 app.secret_key = os.environ.get('APP_SECRET_KEY', None)
-domain = str(os.environ.get('HEROKU_APP_NAME', None))
+domain = str(os.environ.get('TEXTDOMAIN', None))
 print('domain: ' + domain)
 
 # This information is obtained upon registration of a new Awair OAuth
