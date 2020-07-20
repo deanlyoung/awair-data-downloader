@@ -272,7 +272,7 @@ def manual_refresh():
 			redirect_url = 'https://awair-data-downloader.herokuapp.com/menu'
 			token = jsonify(session['oauth_object'])
 			session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
-			return return f"<html><body><p>You will be redirected in 3 seconds</p><p>{ token }</p><script>var timer = setTimeout(function() {{window.location='{ redirect url }'}}, 3000);</script></body></html>"
+			return return f"<html><body><p>You will be redirected in 3 seconds</p><p>{{ token }}</p><script>var timer = setTimeout(function() {window.location='{{ redirect url }}'}, 3000);</script></body></html>"
 		except Exception as e:
 			print(e)
 			return redirect('/manual-refresh')
