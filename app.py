@@ -223,7 +223,7 @@ def air_data_download():
 			air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			samples = air_data['data']
 			samples_array = []
-			header = ['timestamp','score','temp','humid','co2','voc','pm25']
+			header = ['timestamp','device_uuid','score','temp','humid','co2','voc','pm25']
 			samples_array.append(header)
 			for sample in samples:
 				row = [None] * 8
