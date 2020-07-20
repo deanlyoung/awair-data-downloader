@@ -276,8 +276,8 @@ def manual_refresh():
 			redirect = "{window.location='" + redirect_url + "'}"
 			return """
 			<html><body>
-			<p>You will be redirected in 3 seconds</p><p>{{ token }}</p>
-			<script>var timer = setTimeout(function() " + {{ redirect }} + ", 3000);</script>
+			<p>You will be redirected in 3 seconds</p><p>{token}</p>
+			<script>var timer = setTimeout(function() {redirect}, 3000);</script>
 			</body></html>
 			"""
 		except Exception as e:
