@@ -18,6 +18,8 @@ app.permanent_session_lifetime = timedelta(days=1)
 # Keep this secret_key safe and do not share anywhere
 # except in your config variables or somewhere else secure
 app.secret_key = os.environ.get('APP_SECRET_KEY', None)
+domain = os.environ.get('HEROKU_APP_NAME', None)
+print('domain: ' + domain)
 
 # This information is obtained upon registration of a new Awair OAuth
 # application at https://developer.getawair.com
@@ -25,7 +27,7 @@ app.secret_key = os.environ.get('APP_SECRET_KEY', None)
 # except in your config variables or somewhere else secure
 client_id = os.environ.get('CLIENT_ID', None)
 client_secret = os.environ.get('CLIENT_SECRET', None)
-redirect_uri = "https://awair-data-downloader.herokuapp.com/callback"
+redirect_uri = "https://" + domain + ".herokuapp.com/callback"
 
 # Uncomment for detailed oauthlib logs
 import logging
@@ -269,10 +271,16 @@ def manual_refresh():
 		
 		oauth = OAuth2Session(client_id, token=token)
 		try:
-			redirect_url = 'https://awair-data-downloader.herokuapp.com/menu'
 			token = jsonify(session['oauth_object'])
 			session['oauth_object'] = oauth.refresh_token(refresh_url, **extra)
-			return return f"<html><body><p>You will be redirected in 3 seconds</p><p>{{ token }}</p><script>var timer = setTimeout(function() {window.location='{{ redirect_url }}'}, 3000);</script></body></html>"
+			redirect_url = 'https://' + domain + '.herokuapp.com/menu'
+			redirect = "{window.location='" + redirect_url + "'}"
+			return """
+			<html><body>
+			<p>You will be redirected in 3 seconds</p><p>{{ token }}</p>
+			<script>var timer = setTimeout(function() " + {{ redirect }} + ", 3000);</script>
+			</body></html>
+			"""
 		except Exception as e:
 			print(e)
 			return redirect('/manual-refresh')
