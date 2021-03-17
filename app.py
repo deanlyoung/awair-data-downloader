@@ -5,6 +5,8 @@ from datetime import date
 from datetime import time
 from datetime import datetime
 from datetime import timedelta
+from statistics import mean
+import collections
 import json
 import csv
 from flask import Flask, request, redirect, session, url_for, send_file
@@ -17,6 +19,7 @@ app.permanent_session_lifetime = timedelta(days=1)
 
 # Keep this secret_key safe and do not share anywhere
 # except in your config variables or somewhere else secure
+# 
 app.secret_key = os.environ.get('APP_SECRET_KEY', None)
 subdomain = os.environ.get('APP_NAME', None)
 
@@ -24,11 +27,13 @@ subdomain = os.environ.get('APP_NAME', None)
 # application at https://developer.getawair.com
 # Keep these safe and do not share anywhere
 # except in your config variables or somewhere else secure
+# 
 client_id = os.environ.get('CLIENT_ID', None)
 client_secret = os.environ.get('CLIENT_SECRET', None)
 redirect_uri = "https://" + subdomain + ".herokuapp.com/callback"
 
 # Uncomment for detailed oauthlib logs
+# 
 import logging
 import sys
 log = logging.getLogger('oauthlib')
@@ -36,6 +41,7 @@ log.addHandler(logging.StreamHandler(sys.stdout))
 log.setLevel(logging.DEBUG)
 
 # OAuth endpoints given in the Awair API documentation
+# 
 authorization_base_url = "https://oauth-login.awair.is"
 token_url = "https://oauth2.awair.is/v2/token"
 refresh_url = token_url # True for Awair but not all providers.
@@ -43,34 +49,36 @@ scope = ""
 
 @app.route("/")
 def demo():
-	"""Step 1: User Authorization.
-	
-	Redirect the user/resource owner to the OAuth provider (i.e. Awair)
-	using an URL with a few key OAuth parameters.
-	"""
+	# Step 1: User Authorization.
+	# 
+	# Redirect the user/resource owner to the OAuth provider (i.e. Awair)
+	# using an URL with a few key OAuth parameters.
+	# 
 	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 	authorization_url, state = oauth.authorization_url(authorization_base_url)
 	
 	# State is used to prevent CSRF, keep this for later.
+	# 
 	session['state'] = state
 	return redirect(authorization_url)
 
 
 # Step 2: User authorization, this happens on the provider.
+# 
 @app.route("/callback", methods=["GET"])
 def callback():
 	code = request.args.get('code')
-	""" Step 3: Retrieving an access token.
-	
-	The user has been redirected back from the provider to your registered
-	callback URL. With this redirection comes an authorization code included
-	in the redirect URL. We will use that to obtain an access token.
-	"""
+	# Step 3: Retrieving an access token.
+	# 
+	# The user has been redirected back from the provider to your registered
+	# callback URL. With this redirection comes an authorization code included
+	# in the redirect URL. We will use that to obtain an access token.
+	# 
 	try:
 		url = 'https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code
-		token_obj = requests.get(url)
-		
+		token_obj = requests.post(url)
 		# We use the session as a simple DB for this example.
+		# 
 		session['oauth_object'] = token_obj.json()
 		return redirect('/menu')
 	except Exception as e:
@@ -82,8 +90,8 @@ def callback():
 def menu():
 	if 'oauth_object' in session:
 		creds = session.get("oauth_object", "/menu oauth_object empty")
-		"""Main menu
-		"""
+		# Main menu
+		# 
 		return """
 		<h1>You have successfully logged into your Awair account!</h1>
 		<h2>What would you like to do next?</h2>
@@ -91,6 +99,7 @@ def menu():
 			<li><a href="/profile"> Get account profile</a></li>
 			<li><a href="/devices"> Get account devices</a></li>
 			<li><a href="/air-data"> Get device air-data</a></li>
+			<li><a href="/air-test"> Start an air test</a></li>
 		</ul>
 		<br><br>
 		<ul>
@@ -112,8 +121,8 @@ def profile():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/profile oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetching profile data
-		"""
+		# Fetching profile data
+		# 
 		prof = ""
 		try:
 			profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -131,8 +140,8 @@ def devices():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/devices oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetching device list
-		"""
+		# Fetching device list
+		# 
 		devs = ""
 		try:
 			devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -150,8 +159,8 @@ def air_data():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/air-data oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetch device list
-		"""
+		# Fetch device list
+		# 
 		select_opts = ""
 		try:
 			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -170,30 +179,32 @@ def air_data():
 			today_date = datetime.strptime(str(date.today()), "%Y-%m-%d")
 			subtract_day = today_date + timedelta(days=-1)
 			yesterday_date = datetime.strftime(subtract_day, "%Y-%m-%d")
-			"""Select Device
-			"""
+			# Select Device
+			# 
 			return """
-			<h2>Device, Date, and Temperature Units:</h2>
-			<p>Only one device and one day per download.</p>
-			<form id="air_data_download_form" action="/air-data/download" method="post" enctype="multipart/form-data">
-		    	<label for="device_uuid">Select Device:<br>
-					<select id="device_uuid" name="device_uuid" required>
-						{opts}
-					</select>
-				</label>
-				<br><br>
-				<label for="device">Enter Date (UTC / YYYY-MM-DD):<br>
-					<input type="date" id="date" name="date" pattern="{regex}" value="{yesterday}" max="{yesterday}" step="1" required>
-				</label>
-				<br><br>
-				<span>Choose Temperature Unit:</span><br>
-				<input type="radio" id="temp_f" name="temp_unit" value="true">
-				<label for="temp_f">Fahrenheit (&deg;F)</label><br>
-				<input type="radio" id="temp_c" name="temp_unit" value="false" checked>
-				<label for="temp_c">Celsius (&deg;C)</label>
-				<br><br>
-		    	<input type="submit" value="Download">
-			</form>
+			<html><body>
+				<h2>Device, Date, and Temperature Units:</h2>
+				<p>Only one device and one day per download.</p>
+				<form id="air_data_download_form" action="/air-data/download" method="post" enctype="multipart/form-data">
+			    	<label for="device_uuid">Select Device:<br>
+						<select id="device_uuid" name="device_uuid" required>
+							{opts}
+						</select>
+					</label>
+					<br><br>
+					<label for="device">Enter Date (UTC / YYYY-MM-DD):<br>
+						<input type="date" id="date" name="date" pattern="{regex}" value="{yesterday}" max="{yesterday}" step="1" required>
+					</label>
+					<br><br>
+					<span>Choose Temperature Unit:</span><br>
+					<input type="radio" id="temp_f" name="temp_unit" value="true">
+					<label for="temp_f">Fahrenheit (&deg;F)</label><br>
+					<input type="radio" id="temp_c" name="temp_unit" value="false" checked>
+					<label for="temp_c">Celsius (&deg;C)</label>
+					<br><br>
+			    	<input type="submit" value="Download">
+				</form>
+			</body></html>
 			""".format(opts = str(select_opts), yesterday = str(yesterday_date), regex = "\d{4}-\d{2}-\d{2}")
 		except Exception as e:
 			print(e)
@@ -208,8 +219,8 @@ def air_data_download():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/air-data/download oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetching air-data
-		"""
+		# Fetching air-data
+		# 
 		device_uuid = request.form['device_uuid']
 		device_type = device_uuid.split("_")[0]
 		device_id = device_uuid.split("_")[1]
@@ -223,7 +234,152 @@ def air_data_download():
 			air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			samples = air_data['data']
 			samples_array = []
-			header = ['timestamp','device_uuid','score','temp','humid','co2','voc','pm25']
+			header = ['timestamp','device_uuid','score','temp','humid','co2','voc','pm25','lux','spl_a']
+			samples_array.append(header)
+			for sample in samples:
+				row = [None] * 10
+				row[0] = sample['timestamp']
+				row[1] = str(device_uuid)
+				row[2] = "{:.0f}".format(float(sample['score']))
+				sensors = sample['sensors']
+				for sensor in sensors:
+					if sensor['comp'] == "temp":
+						row[3] = "{:.2f}".format(float(sensor['value']))
+					elif sensor['comp'] == "humid":
+						row[4] = "{:.2f}".format(float(sensor['value']))
+					elif sensor['comp'] == "co2":
+						row[5] = "{:.0f}".format(float(sensor['value']))
+					elif sensor['comp'] == "voc":
+						row[6] = "{:.0f}".format(float(sensor['value']))
+					elif sensor['comp'] == "pm25":
+						row[7] = "{:.0f}".format(float(sensor['value']))
+					elif sensor['comp'] == "lux":
+						row[8] = "{:.1f}".format(float(sensor['value']))
+					elif sensor['comp'] == "spl_A":
+						row[9] = "{:.1f}".format(float(sensor['value']))
+				samples_array.append(row)
+			file_name = device_uuid + '-' + from_date + '.csv'
+			with open(file_name, mode='w', newline='') as samples_file:
+				samples_writer = csv.writer(samples_file, delimiter=',', quoting=csv.QUOTE_ALL)
+				samples_writer.writerows(samples_array)
+			return send_file(file_name, mimetype="text/csv", as_attachment=True)
+		except Exception as e:
+			print(e)
+			return "error :("
+	else:
+		print('redirecting to root to force login')
+		return redirect('/')
+
+
+@app.route("/air-test", methods=["GET"])
+def air_data():
+	if 'oauth_object' in session:
+		oauth_obj = session.get("oauth_object", "/air-test oauth_object empty")
+		bearer_token = oauth_obj['access_token']
+		# Fetch device list
+		# 
+		select_opts = ""
+		try:
+			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
+			devices_dict = devices['devices']
+			count = 0
+			for device in devices_dict:
+				count += 1
+				if device['name'] == "":
+					device_name = device['deviceUUID']
+				else:
+					device_name = device['name']
+				if count == 1:
+					select_opts += '<option value="' + str(device['deviceUUID']) + '" selected>' + str(device_name) + '</option>'
+				else:
+					select_opts += '<option value="' + str(device['deviceUUID']) + '">' + str(device_name) + '</option>'
+			# Select Device
+			# 
+			return """
+			<html><body>
+				<h2>Device and Temperature Units:</h2>
+				<p>You can only stream data from what device at a time.</p>
+				<form id="air_data_test_form" action="/air-test/data-stream" method="post" enctype="multipart/form-data">
+			    	<label for="device_uuid">Select Device:<br>
+						<select id="device_uuid" name="device_uuid" required>
+							{opts}
+						</select>
+					</label>
+					<br><br>
+					<span>Choose Temperature Unit:</span><br>
+					<input type="radio" id="temp_f" name="temp_unit" value="true">
+					<label for="temp_f">Fahrenheit (&deg;F)</label><br>
+					<input type="radio" id="temp_c" name="temp_unit" value="false" checked>
+					<label for="temp_c">Celsius (&deg;C)</label>
+					<br><br>
+			    	<input type="submit" value="Start">
+				</form>
+			</body></html>
+			""".format(opts = str(select_opts))
+		except Exception as e:
+			print(e)
+			return redirect('/air-test')
+	else:
+		print('redirecting to root to force login')
+		return redirect('/')
+
+
+@app.route("/air-test/data-stream", methods=["POST","GET"])
+def air_test_data_stream():
+	if 'oauth_object' in session:
+		oauth_obj = session.get("oauth_object", "/air-test/data-stream oauth_object empty")
+		bearer_token = oauth_obj['access_token']
+		# Fetching air-data
+		# 
+		device_uuid = request.form['device_uuid']
+		device_type = device_uuid.split("_")[0]
+		device_id = device_uuid.split("_")[1]
+		to_time = datetime.datetime.now(datetime.timezone.utc)
+		to_time_formatted = datetime.strftime(to_time, "%Y-%m-%dT%H:%M:00.000Z")
+		from_time = to_time - datetime.timedelta(minutes=1)
+		from_time_formatted = datetime.strftime(from_time, "%Y-%m-%dT%H:%M:00.000Z")
+		fahrenheit = request.form['temp_unit']
+		air_data_url = 'https://developer-apis.awair.is/v1/users/self/devices/' + str(device_type) + '/' + str(device_id) + '/air-data/raw?from=' + str(from_time_formatted) + '&to=' + str(to_time_formatted) + '&limit=6&desc=false&fahrenheit=' + str(fahrenheit)
+		try:
+			air_data = requests.get(air_data_url, headers={'Authorization': 'Bearer ' + bearer_token}).json()
+			samples = air_data['data']
+			# iterate over samples array
+				# pull out score and add to score array
+				# iterate over sensors and add to individual sensor arrays
+			# mean() the score array and individual sensor arrays
+			# build the row of the to_time, device_uuid, score, and sensor averages
+			# update html body
+			list_maker = collections.defaultdict(list)
+			for sample in samples:
+				list_maker['score_list'].append(float(sample['score']))
+				sensors = sample['sensors']
+				for sensor in sensors:
+					if sensor['comp'] == "temp":
+						list_maker['temp_list'].append(float(sensor['value']))
+					elif sensor['comp'] == "humid":
+						list_maker['humid_list'].append(float(sensor['value']))
+					elif sensor['comp'] == "co2":
+						list_maker['co2_list'].append(float(sensor['value']))
+					elif sensor['comp'] == "voc":
+						list_maker['voc_list'].append(float(sensor['value']))
+					elif sensor['comp'] == "pm25":
+						list_maker['pm25_list'].append(float(sensor['value']))
+					elif sensor['comp'] == "lux":
+						list_maker['lux_list'].append(float(sensor['value']))
+					elif sensor['comp'] == "spl_A":
+						list_maker['spl_a_list'].append(float(sensor['value']))
+			score_avg = round(mean(score_list), 0)
+			temp_avg = round(mean(temp_list), 2)
+			humid_avg = round(mean(humid_list), 2)
+			co2_avg = round(mean(co2_list), 0)
+			voc_avg = round(mean(voc_list), 0)
+			pm25_avg = round(mean(pm25_list), 0)
+			lux_avg = round(mean(lux_list), 1)
+			spl_a_avg = round(mean(spl_a_list), 1)
+			
+			
+			samples_array = []
+			header = ['timestamp','device_uuid','score','temp','humid','co2','voc','pm25','lux','spl_a']
 			samples_array.append(header)
 			for sample in samples:
 				row = [None] * 8
@@ -259,8 +415,8 @@ def air_data_download():
 @app.route("/manual-refresh", methods=["GET"])
 def manual_refresh():
 	if 'oauth_object' in session:
-		"""Refreshing an OAuth 2 token using a refresh token.
-		"""
+		# Refreshing an OAuth 2 token using a refresh token.
+		# 
 		token = session.get("oauth_object", "/manual-refresh oauth_object empty")
 		
 		extra = {
@@ -291,6 +447,6 @@ def manual_refresh():
 
 if __name__ == "__main__":
 	# This allows us to use a plain HTTP callback
-	#os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
+	# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = "1"
 	
 	app.run(debug=True)
