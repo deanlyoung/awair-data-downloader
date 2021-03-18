@@ -63,7 +63,7 @@ def callback():
 	# callback URL. With this redirection comes an authorization code included
 	# in the redirect URL. We will use that to obtain an access token.
 	try:
-		data = {'client_id': client_id, 'client_secret': client_secret, 'grant_type': authorization_code, 'code': code}
+		data = {'client_id': client_id, 'client_secret': client_secret, 'grant_type': 'authorization_code', 'code': code}
 		url = refresh_url
 		token_obj = requests.post(url, json=data)
 		
