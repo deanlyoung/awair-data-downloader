@@ -112,7 +112,7 @@ def profile():
 		# Fetching profile data
 		prof = ""
 		try:
-			profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token})
+			profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			return jsonify(profile)
 		except Exception as e:
 			print('error: ' + e)
@@ -130,7 +130,7 @@ def devices():
 		# Fetching device list
 		devs = ""
 		try:
-			devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token})
+			devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			return jsonify(devs)
 		except Exception as e:
 			print('error: ' + e)
@@ -148,7 +148,7 @@ def air_data():
 		# Fetch device list
 		select_opts = ""
 		try:
-			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token})
+			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
 			devices_dict = devices['devices']
 			count = 0
 			for device in devices_dict:
