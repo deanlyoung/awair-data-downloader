@@ -43,11 +43,9 @@ scope = ""
 
 @app.route("/")
 def demo():
-	"""Step 1: User Authorization.
-	
-	Redirect the user/resource owner to the OAuth provider (i.e. Awair)
-	using an URL with a few key OAuth parameters.
-	"""
+	# Step 1: User Authorization.
+	# Redirect the user/resource owner to the OAuth provider (i.e. Awair)
+	# using an URL with a few key OAuth parameters.
 	oauth = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
 	authorization_url, state = oauth.authorization_url(authorization_base_url)
 	
@@ -60,15 +58,14 @@ def demo():
 @app.route("/callback", methods=["GET"])
 def callback():
 	code = request.args.get('code')
-	""" Step 3: Retrieving an access token.
-	
-	The user has been redirected back from the provider to your registered
-	callback URL. With this redirection comes an authorization code included
-	in the redirect URL. We will use that to obtain an access token.
-	"""
+	# Step 3: Retrieving an access token.
+	# The user has been redirected back from the provider to your registered
+	# callback URL. With this redirection comes an authorization code included
+	# in the redirect URL. We will use that to obtain an access token.
 	try:
-		url = 'https://oauth2.awair.is/v2/token?client_id=' + client_id + '&client_secret=' + client_secret + '&grant_type=authorization_code&code=' + code
-		token_obj = requests.get(url)
+		data = {'client_id': client_id, 'client_secret': client_secret, 'grant_type': authorization_code, 'code': code}
+		url = refresh_url
+		token_obj = requests.post(url, json=data)
 		
 		# We use the session as a simple DB for this example.
 		session['oauth_object'] = token_obj.json()
@@ -82,8 +79,7 @@ def callback():
 def menu():
 	if 'oauth_object' in session:
 		creds = session.get("oauth_object", "/menu oauth_object empty")
-		"""Main menu
-		"""
+		# Main menu
 		return """
 		<h1>You have successfully logged into your Awair account!</h1>
 		<h2>What would you like to do next?</h2>
@@ -112,8 +108,7 @@ def profile():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/profile oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetching profile data
-		"""
+		# Fetching profile data
 		prof = ""
 		try:
 			profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -131,8 +126,7 @@ def devices():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/devices oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetching device list
-		"""
+		# Fetching device list
 		devs = ""
 		try:
 			devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -150,8 +144,7 @@ def air_data():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/air-data oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetch device list
-		"""
+		# Fetch device list
 		select_opts = ""
 		try:
 			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
@@ -208,8 +201,7 @@ def air_data_download():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/air-data/download oauth_object empty")
 		bearer_token = oauth_obj['access_token']
-		"""Fetching air-data
-		"""
+		# Fetching air-data
 		device_uuid = request.form['device_uuid']
 		device_type = device_uuid.split("_")[0]
 		device_id = device_uuid.split("_")[1]
@@ -259,8 +251,7 @@ def air_data_download():
 @app.route("/manual-refresh", methods=["GET"])
 def manual_refresh():
 	if 'oauth_object' in session:
-		"""Refreshing an OAuth 2 token using a refresh token.
-		"""
+		# Refreshing an OAuth 2 token using a refresh token.
 		token = session.get("oauth_object", "/manual-refresh oauth_object empty")
 		
 		extra = {
