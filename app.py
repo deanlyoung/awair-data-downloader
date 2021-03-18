@@ -71,7 +71,7 @@ def callback():
 		session['oauth_object'] = token_obj.json()
 		return redirect('/menu')
 	except Exception as e:
-		print(e)
+		print('error: ' + e)
 		return redirect('/')
 
 
@@ -108,13 +108,14 @@ def profile():
 	if 'oauth_object' in session:
 		oauth_obj = session.get("oauth_object", "/profile oauth_object empty")
 		bearer_token = oauth_obj['access_token']
+		print(bearer_token)
 		# Fetching profile data
 		prof = ""
 		try:
-			profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token}).json()
+			profile = requests.get('https://developer-apis.awair.is/v1/users/self', headers={'Authorization': 'Bearer ' + bearer_token})
 			return jsonify(profile)
 		except Exception as e:
-			print(e)
+			print('error: ' + e)
 			return redirect('/profile')
 	else:
 		print('redirecting to root to force login')
@@ -129,10 +130,10 @@ def devices():
 		# Fetching device list
 		devs = ""
 		try:
-			devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
+			devs = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token})
 			return jsonify(devs)
 		except Exception as e:
-			print(e)
+			print('error: ' + e)
 			return redirect('/devices')
 	else:
 		print('redirecting to root to force login')
@@ -147,7 +148,7 @@ def air_data():
 		# Fetch device list
 		select_opts = ""
 		try:
-			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token}).json()
+			devices = requests.get('https://developer-apis.awair.is/v1/users/self/devices', headers={'Authorization': 'Bearer ' + bearer_token})
 			devices_dict = devices['devices']
 			count = 0
 			for device in devices_dict:
@@ -189,7 +190,7 @@ def air_data():
 			</form>
 			""".format(opts = str(select_opts), yesterday = str(yesterday_date), regex = "\d{4}-\d{2}-\d{2}")
 		except Exception as e:
-			print(e)
+			print('error: ' + e)
 			return redirect('/air-data')
 	else:
 		print('redirecting to root to force login')
@@ -241,7 +242,7 @@ def air_data_download():
 				samples_writer.writerows(samples_array)
 			return send_file(file_name, mimetype="text/csv", as_attachment=True)
 		except Exception as e:
-			print(e)
+			print('error: ' + e)
 			return "error :("
 	else:
 		print('redirecting to root to force login')
@@ -273,7 +274,7 @@ def manual_refresh():
 			</body></html>
 			""".format(token = str(token), redirect = str(redirect))
 		except Exception as e:
-			print(e)
+			print('error: ' + e)
 			return redirect('/manual-refresh')
 	else:
 		print('redirecting to root to force login')
